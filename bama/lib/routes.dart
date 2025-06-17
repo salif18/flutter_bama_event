@@ -81,7 +81,7 @@ class _RoutesState extends State<Routes> {
                     shape: BoxShape.circle,
                   ),
                   child: Text(
-                    "3", // nombre de notifications
+                    "5", // nombre de notifications
                     style: TextStyle(fontSize: 10.sp, color: Colors.white),
                   ),
                 ),

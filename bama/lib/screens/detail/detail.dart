@@ -122,15 +122,11 @@ class _DetailViewState extends State<DetailView> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => PayementView(
-                            eventId: "",
-                            ticketType: "",
-                            userId: "",
+                            eventId: widget.item.id,
+                            eventTitle: widget.item.title,
+                            ticketType: ticket.type,
+                            userId: "12b",
                           ),
-                        ),
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("Ticket ${ticket.type} sélectionné"),
                         ),
                       );
                     },

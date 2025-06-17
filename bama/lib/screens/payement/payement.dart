@@ -1,18 +1,23 @@
 import 'package:bama/components/appbar.dart';
 import 'package:bama/models/ticket_model.dart';
+import 'package:bama/screens/tickets/tickets.dart';
 import 'package:bama/utils/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class PayementView extends StatefulWidget {
   final String eventId;
+  final String eventTitle;
   final String ticketType;
   final String userId;
   const PayementView({
     super.key,
     required this.eventId,
+    required this.eventTitle,
     required this.ticketType,
     required this.userId,
   });
@@ -22,9 +27,36 @@ class PayementView extends StatefulWidget {
 }
 
 class _PayementViewState extends State<PayementView> {
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _amountController = TextEditingController();
+
+  String selectedMethod = 'Orange Money';
+
+  void _pay() {
+    String phone = _phoneController.text.trim();
+    String amount = _amountController.text.trim();
+
+    if (phone.isEmpty || amount.isEmpty) {
+      Fluttertoast.showToast(msg: "Veuillez remplir tous les champs");
+      return;
+    }
+
+    // Simule un paiement
+    Fluttertoast.showToast(
+      msg: "Paiement de $amount FCFA via $selectedMethod en cours...",
+      toastLength: Toast.LENGTH_LONG,
+    );
+
+    //Intégrer ici l’API Orange Money / MobiCash
+
+    //declencher la fonction pour creer ticket apres avoir acheter 
+   buyTicket(eventId: widget.eventId, eventTitle: widget.eventTitle,ticketType: widget.ticketType);
+  }
+
   // 4️⃣ CRÉATION DE TICKET APRÈS ACHAT
   Future<void> buyTicket({
     required String eventId,
+    required String   eventTitle,
     required String ticketType,
   }) async {
     final user = FirebaseAuth.instance.currentUser;
@@ -33,7 +65,7 @@ class _PayementViewState extends State<PayementView> {
       ticketId: id,
       eventId: eventId,
       userId: user!.uid,
-      eventTitle: '',
+      eventTitle: eventTitle,
       ticketType: ticketType,
       qrCode: id,
       purchasedAt: DateTime.now().toIso8601String(),
@@ -43,31 +75,18 @@ class _PayementViewState extends State<PayementView> {
         .collection('tickets')
         .doc(id)
         .set(ticket.toJson());
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (_) => TicketView(ticket: response.data),
-    //   ),
-    // );
+
+    print(ticket);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => TicketView(),
+      ),
+    );
   }
 
-  // 5️⃣ SCANNER ET VÉRIFIER UN TICKET
-  // Future<String> scanAndVerifyTicket(String currentEventId) async {
-  //   final scannedId = await FlutterBarcodeScanner.scanBarcode("#ff6666", "Cancel", true, ScanMode.QR);
-
-  //   if (scannedId == '-1') return 'Scan annulé';
-
-  //   final doc = await FirebaseFirestore.instance.collection('tickets').doc(scannedId).get();
-  //   if (!doc.exists) return '❌ Ticket invalide';
-
-  //   final ticket = TicketModel.fromJson(doc.data()!);
-  //   if (ticket.eventId != currentEventId) return '❌ Mauvais événement';
-  //   if (ticket.isUsed) return '⚠️ Déjà utilisé';
-
-  //   await FirebaseFirestore.instance.collection('tickets').doc(ticket.ticketId).update({"is_used": true});
-  //   return '✅ Ticket validé';
-  // }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,7 +97,137 @@ class _PayementViewState extends State<PayementView> {
           color: ColorApp.backgroundApp,
           child: CustomScrollView(
             slivers: [
-              BuildAppBar(title: "Mode de payement", bouttonAction: true),
+              BuildAppBar(
+                title: "Ticket ${widget.ticketType}",
+                bouttonAction: true,
+              ),
+              SliverPadding(
+                padding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 16.r),
+                sliver: SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Choisissez une méthode de paiement",
+                        style: GoogleFonts.poppins(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 12.h),
+                      DropdownButtonFormField<String>(
+                        isDense: false,
+                        dropdownColor: ColorApp.backgroundCard,
+                        value: selectedMethod,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                        ),
+                        items: ['Orange Money', 'MobiCash'].map((method) {
+                          return DropdownMenuItem(
+                            value: method,
+                            child: Row(
+                              children: [
+                                Image.asset(
+                                  method == "Orange Money"
+                                      ? "assets/logos/orange.jpg"
+                                      : "assets/logos/moov.webp",
+                                  width: 30.w,
+                                  height: 30.h,
+                                  fit: BoxFit.contain,
+                                ),
+                                SizedBox(width: 20.w),
+                                Text(
+                                  method,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (val) {
+                          setState(() {
+                            selectedMethod = val!;
+                          });
+                        },
+                      ),
+                      SizedBox(height: 16.h),
+                      TextField(
+                        style: GoogleFonts.poppins( 
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.bold,
+                          color:Colors.white
+                        ),
+                        controller: _phoneController,
+                        decoration: InputDecoration(
+                          labelText: "Numéro de téléphone",
+                          labelStyle: GoogleFonts.poppins(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(
+                            Icons.phone,
+                            size: 20.sp,
+                            color: Colors.white,
+                          ),
+                        ),
+                        keyboardType: TextInputType.phone,
+                      ),
+                      SizedBox(height: 16.h),
+                      TextField(
+                         style: GoogleFonts.poppins( 
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.bold,
+                          color:Colors.white
+                        ),
+                        controller: _amountController,
+                        decoration: InputDecoration(
+                          labelText: "Montant (FCFA)",
+                          labelStyle: GoogleFonts.poppins(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(
+                            Icons.money,
+                            size: 20.sp,
+                            color: Colors.white,
+                          ),
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
+                      SizedBox(height: 20.h),
+                      ElevatedButton.icon(
+                        onPressed: _pay,
+                        icon: Icon(Icons.payment, color: Colors.white),
+                        label: Text(
+                          "Payer",
+                          style: GoogleFonts.poppins(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.deepOrange,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 30.r,
+                            vertical: 12.r,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),

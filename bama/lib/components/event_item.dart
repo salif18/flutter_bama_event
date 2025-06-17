@@ -65,7 +65,7 @@ class EventItem extends StatelessWidget {
                     SizedBox(height: 4.h),
                     Row(
                       children: [
-                        Icon(Icons.location_on, size: 16.sp, color: Colors.red),
+                        Icon(Icons.location_on, size: 16.sp, color: Colors.white),
                         SizedBox(width: 4.w),
                         Expanded(
                           child: Text(

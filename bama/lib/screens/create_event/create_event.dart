@@ -4,6 +4,9 @@ import 'package:bama/components/appbar.dart';
 import 'package:bama/maps/maps.dart';
 import 'package:bama/models/categorie_model.dart';
 import 'package:bama/utils/colors.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -96,8 +99,67 @@ class _FormEventState extends State<FormEvent> {
     });
   }
 
-  void submit() {
+  // vers firebase
+  Future<String> uploadSingleImageToFirebase(XFile image) async {
+  final FirebaseStorage storage = FirebaseStorage.instance;
+
+  File file = File(image.path);
+
+  // Référence unique pour l’image
+  final Reference ref = storage.ref().child(
+    'images/${DateTime.now().millisecondsSinceEpoch}_${image.name}',
+  );
+
+  final UploadTask uploadTask = ref.putFile(file);
+  await uploadTask;
+
+  final String downloadUrl = await ref.getDownloadURL();
+  return downloadUrl; // ✅ retourne une seule URL
+}
+
+
+// vers cloudinary
+  Future<String?> uploadSingleImageToCloudinary(XFile image) async {
+  const cloudName = 'dm4qhqazr'; // ← Ton Cloudinary cloud name
+  const uploadPreset = 'bama_event'; // ← Ton preset signé
+
+  final dio = Dio();
+
+  final file = await MultipartFile.fromFile(
+    image.path,
+    filename: image.name,
+  );
+
+  final formData = FormData.fromMap({
+    'file': file,
+    'upload_preset': uploadPreset,
+  });
+
+  try {
+    final response = await dio.post(
+      'https://api.cloudinary.com/v1_1/$cloudName/image/upload',
+      data: formData,
+    );
+
+    if (response.statusCode == 200) {
+      return response.data['secure_url']; // ✅ retourne une seule URL
+    } else {
+      print('Erreur Cloudinary (${response.statusCode}): ${response.data}');
+      return null;
+    }
+  } catch (e) {
+    print('Erreur lors de l\'upload : $e');
+    return null;
+  }
+}
+
+
+  void submit() async{
     if (_formKey.currentState!.validate()) {
+
+      final imageUrl = await uploadSingleImageToCloudinary(galleryImage!);
+      // final imageUrl = await uploadSingleImageToFirebase(galleryImage!);
+
       final eventData = {
         'title': titleCtrl.text,
         'description': descriptionCtrl.text,
@@ -106,7 +168,7 @@ class _FormEventState extends State<FormEvent> {
         'location': locationCtrl.text,
         'lat': double.tryParse(latCtrl.text) ?? 0,
         'long': double.tryParse(longCtrl.text) ?? 0,
-        'imageUrl': imageUrlCtrl.text,
+        'imageUrl': imageUrl,
         'ticketTypes': ticketTypeControllers.map((map) {
           return {
             'type': map['type']!.text,
@@ -118,13 +180,12 @@ class _FormEventState extends State<FormEvent> {
 
       print("🎉 Événement prêt à être envoyé :");
       print(eventData);
+      
+      // TODO: envoyer dans Firebase ou autre backend   
+     final docRef = FirebaseFirestore.instance.collection('events').doc(); // Génère un ID
+     await docRef.set(eventData);
 
-      // TODO: envoyer dans Firebase ou autre backend
-      // 2️⃣ AJOUTER UN ÉVÉNEMENT DANS FIRESTORE
-      // Future<void> addEvent(Event event) async {
-      //   final doc = FirebaseFirestore.instance.collection('events').doc(event.id);
-      //   await doc.set(event);
-      // }
+      // addEvent(eventData);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Événement prêt à être enregistré.")),
