@@ -113,7 +113,7 @@ Widget _buildContainer(BuildContext context) {
           tabs: [
             Tab(
               child: Text(
-                "Evènements à venir",
+                "A venir",
                 style: GoogleFonts.roboto(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.bold,
@@ -122,7 +122,7 @@ Widget _buildContainer(BuildContext context) {
             ),
             Tab(
               child: Text(
-                "Evènements passés",
+                "Précedents",
                 style: GoogleFonts.roboto(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.bold,

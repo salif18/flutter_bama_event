@@ -1,4 +1,5 @@
 import 'package:bama/components/notification.dart';
+import 'package:bama/provider/notifcation_provider.dart';
 import 'package:bama/routes.dart';
 import 'package:bama/utils/colors.dart';
 // import 'package:firebase_core/firebase_core.dart';
@@ -6,6 +7,7 @@ import 'package:bama/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 // import 'firebase_options.dart';
 
 // Permet de declencher la notification en arriere plan meme si app est fermé
@@ -31,7 +33,12 @@ void main(){
 
   // lire la notification en arriere plan
   // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  runApp(const MyApp());
+    runApp(
+    MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => NotificationController())],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {

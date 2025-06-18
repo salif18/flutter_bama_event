@@ -30,7 +30,7 @@ class BuildAppBarHome extends StatelessWidget {
       actions: [
         IconButton(
           onPressed: ()=> Navigator.push(context, MaterialPageRoute(builder: (context) => ScanTicketPage())),
-          icon: Icon(Icons.qr_code_scanner, size: 28.sp,color: const Color.fromARGB(255, 34, 110, 133))),
+          icon: Icon(Icons.qr_code_scanner, size: 28.sp,color: const Color.fromARGB(255, 90, 68, 28))),
         SizedBox(width: 16.w)
       ],
     );

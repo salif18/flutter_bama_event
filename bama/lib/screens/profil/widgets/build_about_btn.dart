@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mdi_icons/flutter_mdi_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class BuildShareBtn extends StatelessWidget {
-  const BuildShareBtn({super.key});
+class BuildAboutBtn extends StatelessWidget {
+  const BuildAboutBtn({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,9 +19,9 @@ class BuildShareBtn extends StatelessWidget {
             onTap: () {
             
             },
-            leading: Icon(Icons.share, size: 22.sp, color: Colors.grey[200]),
+            leading: Icon(Mdi.informationOutline, size: 22.sp, color: Colors.grey[200]),
             title: Text(
-              "Partager",
+              "A propos",
               style: GoogleFonts.poppins(
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w400,
