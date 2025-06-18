@@ -25,7 +25,7 @@ class BuildWelcomMessage extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  "Explore ce qui se pointe à proximité",
+                  "Découvrir ce qui se pointe à proximité",
                   style: GoogleFonts.roboto(
                     fontSize: 14.sp,
                     color: const Color.fromARGB(255, 219, 217, 217),

@@ -44,7 +44,7 @@ class EventImageHeader extends SliverPersistentHeaderDelegate {
               alignment: Alignment.topLeft,
               child: CircleAvatar(
                 // ignore: deprecated_member_use
-                backgroundColor: Colors.black.withOpacity(0.4),
+                backgroundColor: Colors.amber.withOpacity(0.4),
                 child: IconButton(
                   icon: Icon(Icons.arrow_back, color: Colors.white),
                   onPressed: onBack,

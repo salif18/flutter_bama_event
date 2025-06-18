@@ -24,7 +24,7 @@ class NotificationSettingsPage extends StatelessWidget {
                 color: Colors.grey[200],
               ),
             ),
-            activeColor: Colors.green,
+            activeColor: Colors.greenAccent,
             activeTrackColor: ColorApp.backgroundCard,
             inactiveThumbColor: ColorApp.backgroundApp,
             inactiveTrackColor: ColorApp.backgroundCard,

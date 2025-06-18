@@ -77,7 +77,8 @@ class _HomeViewState extends State<HomeView> {
           style: GoogleFonts.roboto(
             fontSize: 16.sp,
             fontWeight: FontWeight.bold,
-            color: Colors.amber,
+            // ignore: deprecated_member_use
+            color: Colors.white.withOpacity(0.7),
           ),
         ),
       ),
@@ -100,7 +101,7 @@ Widget _buildContainer(BuildContext context) {
         ),
         child: TabBar(
           indicator: BoxDecoration(
-            color: ColorApp.titleColor,
+            color: const Color.fromARGB(255, 173, 117, 44),
             borderRadius: BorderRadius.horizontal(
               left: Radius.circular(20.r),
               right: Radius.circular(20.r),
@@ -108,12 +109,12 @@ Widget _buildContainer(BuildContext context) {
           ),
           indicatorSize: TabBarIndicatorSize.tab,
           dividerColor: Colors.transparent, // 👈 empêche le petit trait du bas
-          labelColor: Colors.black,
+          labelColor: Colors.white,
           unselectedLabelColor: ColorApp.titleColor,
           tabs: [
             Tab(
               child: Text(
-                "A venir",
+                "À venir",
                 style: GoogleFonts.roboto(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.bold,

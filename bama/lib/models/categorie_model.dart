@@ -36,7 +36,7 @@ class CategorieModel {
       ),
       CategorieModel(
         icon: Mdi.emoticonHappyOutline,
-        title: 'Fête',
+        title: 'Soirée',
         color: Colors.orangeAccent,
       ),
       CategorieModel(

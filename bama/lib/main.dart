@@ -23,7 +23,7 @@ void main(){
     const SystemUiOverlayStyle(
       statusBarColor: ColorApp.backgroundApp,// 👈 ta couleur de fond souhaitée
       statusBarIconBrightness:
-          Brightness.dark, // ou Brightness.dark si fond clair
+          Brightness.light, // ou Brightness.dark si fond clair
     ),
   );
   // WidgetsFlutterBinding.ensureInitialized();
