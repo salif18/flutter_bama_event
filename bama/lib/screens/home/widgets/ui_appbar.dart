@@ -16,10 +16,9 @@ class BuildAppBarHome extends StatelessWidget {
       flexibleSpace: FlexibleSpaceBar(
         background: Container(color: ColorApp.backgroundApp,),
         titlePadding: EdgeInsets.symmetric(horizontal: 16.r,vertical:8.r),
-        // centerTitle: true,
+        centerTitle: true,
         title:Container(         
           decoration: BoxDecoration(
-             color: Colors.black,
             borderRadius: BorderRadius.circular(10.r)
           ),
           child: Image.asset("assets/logos/logo_principal.png",
