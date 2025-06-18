@@ -6,6 +6,9 @@ class TicketModel {
   final String userId;
   final String eventTitle;
   final String ticketType;
+  final String organiserId;
+  final int commission;
+  final int netRevenue;
   final String qrCode;
   final String purchasedAt;
   final bool isUsed;
@@ -16,6 +19,9 @@ class TicketModel {
     required this.userId,
     required this.eventTitle,
     required this.ticketType,
+    required this.organiserId,
+    required this.commission,
+    required this.netRevenue,
     required this.qrCode,
     required this.purchasedAt,
     required this.isUsed
@@ -28,6 +34,9 @@ class TicketModel {
       userId: json["user_id"],
       eventTitle: json["event_title"],
       ticketType: json["ticket_type"],
+      organiserId: json['organiserId'],
+      commission: json['commission'],
+      netRevenue: json['netRevenue'],
       qrCode: json["qr_code"],
       purchasedAt: json["purchasedAt"],
       isUsed: json['is_used'],
@@ -41,6 +50,9 @@ class TicketModel {
       "user_id": userId,
       "event_title":eventTitle,
       "type": ticketType,
+      'organisaerId':organiserId,
+      'commission':commission,
+      'netRevenue':netRevenue,
       "qr_code": qrCode,
       "purchased_at": purchasedAt,
       'is_used': isUsed,
@@ -56,6 +68,9 @@ class TicketModel {
         userId: 'user_101',
         eventTitle: 'Concert Burna Boy',
         ticketType: 'VIP',
+        organiserId: '2d',
+        commission: 100,
+        netRevenue: 1900,
         qrCode: 'QR-001-VIP-${uuid.v4().substring(0, 8)}',
         purchasedAt: '2025-06-10T15:45:00Z',
         isUsed: false,
@@ -66,6 +81,9 @@ class TicketModel {
         userId: 'user_102',
         eventTitle: 'Festival de la Musique Africaine',
         ticketType: 'Pass Jour',
+         organiserId: '2d',
+        commission: 100,
+        netRevenue: 1900,
         qrCode: 'QR-002-JOUR-${uuid.v4().substring(0, 8)}',
         purchasedAt: '2025-06-11T10:30:00Z',
         isUsed: false,
@@ -76,6 +94,9 @@ class TicketModel {
         userId: 'user_103',
         eventTitle: 'Match Mali vs Sénégal',
         ticketType: 'Tribune',
+         organiserId: '2d',
+        commission: 100,
+        netRevenue: 1900,
         qrCode: 'QR-003-TRIB-${uuid.v4().substring(0, 8)}',
         purchasedAt: '2025-06-12T09:20:00Z',
         isUsed: false,
@@ -86,6 +107,9 @@ class TicketModel {
         userId: 'user_104',
         eventTitle:  'Soirée Dîner dansant',
         ticketType: 'Couple',
+         organiserId: '2d',
+        commission: 100,
+        netRevenue: 1900,
         qrCode: 'QR-004-COUPLE-${uuid.v4().substring(0, 8)}',
         purchasedAt: '2025-06-13T19:10:00Z',
         isUsed: false,
@@ -96,6 +120,9 @@ class TicketModel {
         userId: 'user_105',
         eventTitle:  'Avant-première "Racines Africaines"',
         ticketType: 'VIP',
+         organiserId: '2d',
+        commission: 100,
+        netRevenue: 1900,
         qrCode: 'QR-005-VIP-${uuid.v4().substring(0, 8)}',
         purchasedAt: '2025-06-14T13:00:00Z',
         isUsed: false,

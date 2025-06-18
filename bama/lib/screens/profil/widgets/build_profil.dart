@@ -1,3 +1,4 @@
+import 'package:bama/screens/auth/login.dart';
 import 'package:bama/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,7 +13,7 @@ class BuildProfil extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 8.r),
       sliver: SliverToBoxAdapter(
         child: SizedBox(
-          height: 90.h,
+          height: 80.h,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -44,17 +45,21 @@ class BuildProfil extends StatelessWidget {
                     ),
                   ),
                    SizedBox(height: 12.h),
-                  TextButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorApp.backgroundCard,
-                    ),
-                    onPressed: () {},
-                    child: Text(
-                      "Déconnexion",
-                      style: GoogleFonts.poppins(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                  Expanded(
+                    child: TextButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ColorApp.backgroundCard,
+                      ),
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => LoginView()));
+                      },
+                      child: Text(
+                        "Connexion",
+                        style: GoogleFonts.poppins(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),

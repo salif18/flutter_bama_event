@@ -16,7 +16,6 @@ class DetailView extends StatefulWidget {
 }
 
 class _DetailViewState extends State<DetailView> {
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,7 +37,7 @@ class _DetailViewState extends State<DetailView> {
                   onBack: () => Navigator.pop(context),
                 ),
               ),
-               BuildInfoEvent(item:widget.item),
+              BuildInfoEvent(item: widget.item),
             ],
           ),
         ),
@@ -68,8 +67,6 @@ class _DetailViewState extends State<DetailView> {
     );
   }
 
-  
-
   void _windowShow(context) {
     showModalBottomSheet(
       context: context,
@@ -88,7 +85,7 @@ class _DetailViewState extends State<DetailView> {
                 style: GoogleFonts.poppins(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white
+                  color: Colors.white,
                 ),
               ),
               SizedBox(height: 12.h),
@@ -102,19 +99,23 @@ class _DetailViewState extends State<DetailView> {
                       style: GoogleFonts.poppins(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w600,
-                        color: ColorApp.titleColor
-                        ),
+                        color: ColorApp.titleColor,
+                      ),
                     ),
-                    subtitle: Text("Accès ${ticket.type}", style: GoogleFonts.poppins(
+                    subtitle: Text(
+                      "Accès ${ticket.type}",
+                      style: GoogleFonts.poppins(
                         fontSize: 10.sp,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white
-                        ),),
+                        color: Colors.white,
+                      ),
+                    ),
                     trailing: Text(
                       "${ticket.price.toString()} FCFA",
-                      style:GoogleFonts.montserrat(
+                      style: GoogleFonts.montserrat(
                         fontSize: 12.sp,
-                        color: ColorApp.titleColor),
+                        color: ColorApp.titleColor,
+                      ),
                     ),
                     onTap: () {
                       Navigator.pop(context);
@@ -126,6 +127,8 @@ class _DetailViewState extends State<DetailView> {
                             eventTitle: widget.item.title,
                             ticketType: ticket.type,
                             userId: "12b",
+                            organiserId: widget.item.organiserId,
+                            amount: ticket.price,
                           ),
                         ),
                       );

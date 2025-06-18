@@ -14,12 +14,16 @@ class PayementView extends StatefulWidget {
   final String eventTitle;
   final String ticketType;
   final String userId;
+  final String organiserId;
+  final int amount;
   const PayementView({
     super.key,
     required this.eventId,
     required this.eventTitle,
     required this.ticketType,
     required this.userId,
+    required this.organiserId,
+    required this.amount,
   });
 
   @override
@@ -31,6 +35,12 @@ class _PayementViewState extends State<PayementView> {
   final TextEditingController _amountController = TextEditingController();
 
   String selectedMethod = 'Orange Money';
+
+  @override
+  void initState() {
+    super.initState();
+    _amountController.text = widget.amount.toString();
+  }
 
   void _pay() {
     String phone = _phoneController.text.trim();
@@ -49,15 +59,32 @@ class _PayementViewState extends State<PayementView> {
 
     //Intégrer ici l’API Orange Money / MobiCash
 
-    //declencher la fonction pour creer ticket apres avoir acheter 
-   buyTicket(eventId: widget.eventId, eventTitle: widget.eventTitle,ticketType: widget.ticketType);
+    //declencher la fonction pour creer ticket apres avoir acheter
+    // final user = FirebaseAuth.instance.currentUser;
+    // final id = FirebaseFirestore.instance.collection('tickets').doc().id;
+
+    const double commissionRate = 0.10; // 10%
+    final int commission = (widget.amount * commissionRate).round();
+    final int netRevenue = widget.amount - commission;
+
+    buyTicket(
+      eventId: widget.eventId,
+      eventTitle: widget.eventTitle,
+      ticketType: widget.ticketType,
+      organiserId: widget.organiserId,
+      commission: commission,
+      netRevenue: netRevenue,
+    );
   }
 
   // 4️⃣ CRÉATION DE TICKET APRÈS ACHAT
   Future<void> buyTicket({
     required String eventId,
-    required String   eventTitle,
+    required String eventTitle,
     required String ticketType,
+    required String organiserId,
+    required int commission,
+    required int netRevenue,
   }) async {
     final user = FirebaseAuth.instance.currentUser;
     final id = FirebaseFirestore.instance.collection('tickets').doc().id;
@@ -67,6 +94,9 @@ class _PayementViewState extends State<PayementView> {
       userId: user!.uid,
       eventTitle: eventTitle,
       ticketType: ticketType,
+      organiserId: organiserId,
+      commission: commission,
+      netRevenue: netRevenue,
       qrCode: id,
       purchasedAt: DateTime.now().toIso8601String(),
       isUsed: false,
@@ -78,15 +108,19 @@ class _PayementViewState extends State<PayementView> {
 
     print(ticket);
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => TicketView(),
-      ),
-    );
+    // Enregistrer la commission dans une autre collection (facultatif mais recommandé)
+    await FirebaseFirestore.instance.collection('commissions').add({
+      'ticketId': id,
+      'eventId': eventId,
+      'userId': user.uid,
+      'organiserId': organiserId,
+      'commission': commission,
+      'timestamp': DateTime.now(),
+    });
+
+    Navigator.push(context, MaterialPageRoute(builder: (_) => TicketView()));
   }
 
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -158,10 +192,10 @@ class _PayementViewState extends State<PayementView> {
                       ),
                       SizedBox(height: 16.h),
                       TextField(
-                        style: GoogleFonts.poppins( 
+                        style: GoogleFonts.poppins(
                           fontSize: 14.sp,
                           fontWeight: FontWeight.bold,
-                          color:Colors.white
+                          color: Colors.white,
                         ),
                         controller: _phoneController,
                         decoration: InputDecoration(
@@ -182,10 +216,10 @@ class _PayementViewState extends State<PayementView> {
                       ),
                       SizedBox(height: 16.h),
                       TextField(
-                         style: GoogleFonts.poppins( 
+                        style: GoogleFonts.poppins(
                           fontSize: 14.sp,
                           fontWeight: FontWeight.bold,
-                          color:Colors.white
+                          color: Colors.white,
                         ),
                         controller: _amountController,
                         decoration: InputDecoration(

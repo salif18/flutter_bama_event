@@ -1,5 +1,6 @@
 class Event {
   final String id;
+  final String organiserId;
   final String title;
   final String description;
   final String date;
@@ -12,6 +13,7 @@ class Event {
 
   Event({
     required this.id,
+    required this.organiserId,
     required this.title,
     required this.description,
     required this.date,
@@ -26,6 +28,7 @@ class Event {
   factory Event.fromJson(Map<String, dynamic> json) {
     return Event(
       id: json['_id'],
+      organiserId:json["organiserId"] ,
       title: json['title'],
       description: json['description'],
       date: json['date'],
@@ -43,6 +46,7 @@ class Event {
   Map<String, dynamic> toJon() {
     return {
       '_id': id,
+      'organiserId':organiserId,
       'title': title,
       'description': description,
       'date': date,
@@ -59,6 +63,7 @@ class Event {
   return [
     Event(
       id: '1',
+      organiserId: "12a",
       title: 'Concert Burna Boy',
       description: 'Un concert exceptionnel de Burna Boy avec des invités surprise.',
       date: '2025-07-20',
@@ -74,6 +79,7 @@ class Event {
     ),
     Event(
       id: '2',
+       organiserId: "12a",
       title: 'Festival de la Musique Africaine',
       description: '3 jours de festivités, danses, concerts et gastronomie locale.',
       date: '2025-08-15',
@@ -89,6 +95,7 @@ class Event {
     ),
     Event(
       id: '3',
+       organiserId: "12a",
       title: 'Match Mali vs Sénégal',
       description: 'Match de football amical entre deux géants de l’Afrique de l’Ouest.',
       date: '2025-09-10',
@@ -104,6 +111,7 @@ class Event {
     ),
     Event(
       id: '4',
+       organiserId: "12a",
       title: 'Soirée Dîner dansant',
       description: 'Dîner romantique accompagné de musique live et ambiance festive.',
       date: '2025-07-28',
@@ -119,6 +127,7 @@ class Event {
     ),
     Event(
       id: '5',
+       organiserId: "12a",
       title: 'Avant-première "Racines Africaines"',
       description: 'Film historique avec débat post-projection en présence des acteurs.',
       date: '2025-10-05',
@@ -134,6 +143,7 @@ class Event {
     ),
     Event(
       id: '6',
+       organiserId: "12a",
       title: 'Gala de l’humour africain',
       description: 'Les plus grands humoristes du continent sur une seule scène.',
       date: '2025-11-02',
@@ -149,6 +159,7 @@ class Event {
     ),
     Event(
       id: '7',
+       organiserId: "12a",
       title: 'Foire Artisanale de Bamako',
       description: 'Exposition-vente d’objets d’art, vêtements, nourriture locale.',
       date: '2025-12-01',
@@ -163,6 +174,7 @@ class Event {
     ),
     Event(
       id: '8',
+       organiserId: "12a",
       title: 'Journée Santé & Bien-être',
       description: 'Consultations gratuites, dépistage, conférences et yoga.',
       date: '2025-09-18',
@@ -177,6 +189,7 @@ class Event {
     ),
     Event(
       id: '9',
+       organiserId: "12a",
       title: 'Voyage organisé à Ségou',
       description: 'Excursion touristique avec transport, repas et activités inclus.',
       date: '2025-10-22',
