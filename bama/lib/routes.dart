@@ -1,4 +1,3 @@
-import 'package:bama/screens/create_event/create_event.dart';
 import 'package:bama/screens/home/home.dart';
 import 'package:bama/screens/profil/profil.dart';
 import 'package:bama/screens/tickets/tickets.dart';
@@ -22,7 +21,7 @@ class _RoutesState extends State<Routes> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      body: [HomeView(), TicketView(), FormEvent()][_currentIndex],
+      body: [HomeView(), TicketView(),ProfilView()][_currentIndex],
       bottomNavigationBar: _buildBottomNavigationBar(context),
     );
   }

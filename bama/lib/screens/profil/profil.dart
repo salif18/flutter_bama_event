@@ -1,4 +1,9 @@
 import 'package:bama/components/appbar.dart';
+import 'package:bama/screens/profil/widgets/build_create_btn.dart';
+import 'package:bama/screens/profil/widgets/build_delete_compte.dart';
+import 'package:bama/screens/profil/widgets/build_notification.dart';
+import 'package:bama/screens/profil/widgets/build_profil.dart';
+import 'package:bama/screens/profil/widgets/build_share.dart';
 import 'package:bama/utils/colors.dart';
 import 'package:flutter/material.dart';
 
@@ -19,7 +24,12 @@ class _ProfilViewState extends State<ProfilView> {
           color: ColorApp.backgroundApp,
           child: CustomScrollView(
              slivers: [
-              BuildAppBar(title:"Profil",bouttonAction:false)
+              BuildAppBar(title:"Profil",bouttonAction:false),
+              BuildProfil(),
+              BuildCreateBtn(),
+              BuildShareBtn(),
+              BuildNotificationBtn(),
+              BuildDeleteCompte()
              ],
           ),
         )),
