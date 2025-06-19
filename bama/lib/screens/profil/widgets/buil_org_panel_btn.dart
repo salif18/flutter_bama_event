@@ -22,7 +22,7 @@ class BuildOrganiserPanelBtn extends StatelessWidget {
             },
             leading: Icon(Mdi.chartBar, size: 22.sp, color: Colors.grey[200]),
             title: Text(
-              "Statistiques de vente organisateur",
+              "Statistiques organisateur",
               style: GoogleFonts.poppins(
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w400,

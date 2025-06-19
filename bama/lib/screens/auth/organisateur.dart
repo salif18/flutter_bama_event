@@ -30,20 +30,23 @@ class _OrganisateurViewState extends State<OrganisateurView> {
     try {
       final userCred = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
-        email: emailCtrl.text.trim(),
-        password: passwordCtrl.text.trim(),
-      );
+            email: emailCtrl.text.trim(),
+            password: passwordCtrl.text.trim(),
+          );
 
       await FirebaseFirestore.instance
           .collection('users')
           .doc(userCred.user!.uid)
           .set({
-        'uid': userCred.user!.uid,
-        'name': nameCtrl.text.trim(),
-        'phone': phoneCtrl.text.trim(),
-        'email': emailCtrl.text.trim(),
-        'createdAt': DateTime.now().toIso8601String(),
-      });
+            'userId': userCred.user!.uid,
+            'name': nameCtrl.text.trim(),
+            'phone': phoneCtrl.text.trim(),
+            'email': emailCtrl.text.trim(),
+            'photo': '',
+            'isPremium': false,
+            'subscriptionUntil':'',
+            'createdAt': DateTime.now().toIso8601String(),
+          });
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Compte créé avec succès ✅")),
@@ -79,13 +82,15 @@ class _OrganisateurViewState extends State<OrganisateurView> {
           .collection('users')
           .doc(userCred.user!.uid)
           .set({
-        'uid': userCred.user!.uid,
-        'name': userCred.user!.displayName ?? '',
-        'phone': '',
-        'email': userCred.user!.email,
-        'createdAt': DateTime.now().toIso8601String(),
-      });
-
+            'userId': userCred.user!.uid,
+            'name': userCred.user!.displayName ?? '',
+            'phone': userCred.user!.phoneNumber ?? '',
+            'email': userCred.user!.email,
+            'photo': userCred.user!.photoURL ?? '',
+            'isPremium': false,
+            'subscriptionUntil':'',
+            'createdAt': DateTime.now().toIso8601String(),
+          });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Compte Google connecté ✅")),
       );

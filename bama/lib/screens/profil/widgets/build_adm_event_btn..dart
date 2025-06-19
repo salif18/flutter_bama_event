@@ -1,11 +1,9 @@
-import 'package:bama/screens/panel/dash_admin.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_mdi_icons/flutter_mdi_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class BuildAdminPanelBtn extends StatelessWidget {
-  const BuildAdminPanelBtn({super.key});
+class BuildAdmEventBtn extends StatelessWidget {
+  const BuildAdmEventBtn({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,11 +16,11 @@ class BuildAdminPanelBtn extends StatelessWidget {
           ),
           child: ListTile(
             onTap: () {
-             Navigator.push(context, MaterialPageRoute(builder: (context)=> AdminDashboard()));
+            
             },
-            leading: Icon(Mdi.chartBar, size: 22.sp, color: Colors.grey[200]),
+            leading: Icon(Icons.event_available_sharp, size: 22.sp, color: Colors.grey[200]),
             title: Text(
-              "Statistiques de vente admin",
+              "Les événements",
               style: GoogleFonts.poppins(
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w400,

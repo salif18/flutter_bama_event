@@ -1,7 +1,8 @@
 import 'package:bama/components/appbar.dart';
 import 'package:bama/screens/profil/widgets/buil_org_panel_btn.dart';
-import 'package:bama/screens/profil/widgets/buil_panel_btn.dart';
+import 'package:bama/screens/profil/widgets/buil_admin_panel_btn.dart';
 import 'package:bama/screens/profil/widgets/build_about_btn.dart';
+import 'package:bama/screens/profil/widgets/build_adm_event_btn..dart';
 import 'package:bama/screens/profil/widgets/build_aide.dart';
 import 'package:bama/screens/profil/widgets/build_create_btn.dart';
 import 'package:bama/screens/profil/widgets/build_delete_compte.dart';
@@ -36,6 +37,7 @@ class _ProfilViewState extends State<ProfilView> {
               BuildProfil(),
               BuildPremiumBtn(),
               BuildMyEventBtn(),
+              BuildAdmEventBtn(),
               BuildCreateBtn(),
               BuildAdminPanelBtn(),
               BuildOrganiserPanelBtn(),

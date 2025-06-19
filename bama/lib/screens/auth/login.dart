@@ -1,4 +1,6 @@
 import 'package:bama/screens/auth/signup.dart';
+import 'package:bama/utils/colors.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -54,7 +56,23 @@ class _LoginViewState extends State<LoginView> {
         idToken: googleAuth.idToken,
       );
 
-      await FirebaseAuth.instance.signInWithCredential(credential);
+      final userCred = await FirebaseAuth.instance.signInWithCredential(
+        credential,
+      );
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCred.user!.uid)
+          .set({
+            'userId': userCred.user!.uid,
+            'name': userCred.user!.displayName ?? '',
+            'phone': userCred.user!.phoneNumber ?? '',
+            'email': userCred.user!.email,
+            'photo': userCred.user!.photoURL ?? '',
+            'isPremium': false,
+            'subscriptionUntil': '',
+            'createdAt': DateTime.now().toIso8601String(),
+          });
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Connexion Google réussie ✅")),
@@ -65,28 +83,6 @@ class _LoginViewState extends State<LoginView> {
       ).showSnackBar(SnackBar(content: Text("Erreur Google: ${e.toString()}")));
     } finally {
       setState(() => isLoading = false);
-    }
-  }
-
-  // 🔒 Réinitialisation du mot de passe
-  void _resetPassword() async {
-    final email = emailCtrl.text.trim();
-    if (email.isEmpty || !email.contains('@')) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Entrez un email valide")));
-      return;
-    }
-
-    try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Email de réinitialisation envoyé ✅")),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Erreur: ${e.toString()}")));
     }
   }
 
@@ -155,7 +151,7 @@ class _LoginViewState extends State<LoginView> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed: _resetPassword,
+                          onPressed: () => showResetPasswordDialog(context),
                           child: Text(
                             "Mot de passe oublié ?",
                             style: GoogleFonts.poppins(
@@ -241,7 +237,7 @@ class _LoginViewState extends State<LoginView> {
                                         child: Text(
                                           "Créer un compte",
                                           style: GoogleFonts.roboto(
-                                            color: Colors.orangeAccent,
+                                            color: Colors.amber,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -259,6 +255,130 @@ class _LoginViewState extends State<LoginView> {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> showResetPasswordDialog(BuildContext context) {
+    final TextEditingController emailController = TextEditingController();
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+    bool isLoading = false;
+
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: ColorApp.backgroundCard,
+              title: Text(
+                "Mot de passe oublié",
+                style: GoogleFonts.poppins(
+                  fontSize: 18.sp,
+                  color: Colors.white,
+                ),
+              ),
+              content: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "Entrez votre adresse e-mail pour recevoir un lien de réinitialisation.",
+                      style: GoogleFonts.poppins(
+                        fontSize: 12.sp,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(height: 10.h),
+                    TextFormField(
+                      style: GoogleFonts.poppins(
+                        fontSize: 14.sp,
+                        color: Colors.white,
+                      ),
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        labelText: "Adresse e-mail",
+                        labelStyle: GoogleFonts.poppins(
+                          fontSize: 14.sp,
+                          color: Colors.white,
+                        ),
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null ||
+                            value.isEmpty ||
+                            !value.contains('@')) {
+                          return "Entrez une adresse e-mail valide.";
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    "Annuler",
+                    style: GoogleFonts.poppins(
+                      fontSize: 12.sp,
+                      color: Colors.deepPurple,
+                    ),
+                  ),
+                ),
+                isLoading
+                    ? Padding(
+                        padding: EdgeInsets.all(8.0.r),
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ColorApp.titleColor,
+                        ),
+                        onPressed: () async {
+                          if (!formKey.currentState!.validate()) return;
+
+                          setState(() => isLoading = true);
+
+                          try {
+                            await FirebaseAuth.instance.sendPasswordResetEmail(
+                              email: emailController.text.trim(),
+                            );
+                            Navigator.pop(
+                              context,
+                            ); // Ferme la boîte de dialogue
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  "📩 E-mail de réinitialisation envoyé.",
+                                ),
+                              ),
+                            );
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Erreur : ${e.toString()}"),
+                              ),
+                            );
+                          } finally {
+                            setState(() => isLoading = false);
+                          }
+                        },
+                        child: Text(
+                          "Envoyer",
+                          style: GoogleFonts.poppins(
+                            fontSize: 12.sp,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

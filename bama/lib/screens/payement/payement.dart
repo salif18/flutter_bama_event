@@ -47,7 +47,11 @@ class _PayementViewState extends State<PayementView> {
     String amount = _amountController.text.trim();
 
     if (phone.isEmpty || amount.isEmpty) {
-      Fluttertoast.showToast(msg: "Veuillez remplir tous les champs");
+      Fluttertoast.showToast(
+        msg: "Veuillez remplir tous les champs",
+        backgroundColor: Colors.deepOrange,
+        textColor: Colors.white,
+      );
       return;
     }
 
@@ -251,6 +255,10 @@ class _PayementViewState extends State<PayementView> {
                           ),
                         ),
                         style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadiusGeometry.circular(50),
+                          ),
+                          minimumSize: Size(400.w, 40.h),
                           backgroundColor: Colors.deepOrange,
                           padding: EdgeInsets.symmetric(
                             horizontal: 30.r,
