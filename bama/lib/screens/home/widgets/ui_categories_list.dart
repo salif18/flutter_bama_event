@@ -45,13 +45,14 @@ class BuildCategoriList extends StatelessWidget {
                               size: 20.sp,
                             ),
                           ),
-                          SizedBox(width: 6.w),
-                          Text(
-                            category.title,
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w500,
-                              color: category.color,
+                          Expanded(
+                            child: Text(
+                              category.title,
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w500,
+                                color: category.color,
+                              ),
                             ),
                           ),
                         ],
