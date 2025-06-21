@@ -1,7 +1,6 @@
 import 'package:bama/components/appbar.dart';
+import 'package:bama/screens/payement/payement.dart';
 import 'package:bama/utils/colors.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,41 +13,7 @@ class AbonnementPage extends StatefulWidget {
 }
 
 class _AbonnementPageState extends State<AbonnementPage> {
-  bool isLoading = false;
-
-  Future<void> activerAbonnement() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-
-    setState(() => isLoading = true);
-
-    try {
-      final finAbonnement = DateTime.now().add(Duration(days: 30));
-
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).update(
-        {
-          'isPremium': true,
-          'subscriptionUntil': finAbonnement.toIso8601String(),
-        },
-      );
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            "🎉 Abonnement activé jusqu’au ${finAbonnement.day}/${finAbonnement.month}/${finAbonnement.year}",
-          ),
-        ),
-      );
-    } catch (e) {
-      print("Erreur abonnement : $e");
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Erreur : $e")));
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }
-
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,10 +58,17 @@ class _AbonnementPageState extends State<AbonnementPage> {
                         ),
                       ),
                       SizedBox(height: 200.h,),
-                      isLoading
-                          ? const Center(child: CircularProgressIndicator())
-                          : ElevatedButton.icon(
-                              onPressed: activerAbonnement,
+                      ElevatedButton.icon(
+                              onPressed:()=> Navigator.push(context, MaterialPageRoute(
+                                builder: (context)=> 
+                              PayementView(
+                                eventId: "", 
+                                eventTitle: "", 
+                                ticketType: "Abonnement", 
+                                userId: "", 
+                                organiserId: "", 
+                                amount: 10000, 
+                                PayOf: "abonnement"))),
                               icon: Icon(Icons.lock_open, size: 24.sp, color: Colors.white,),
                               label: Text(
                                 "Activer maintenant",

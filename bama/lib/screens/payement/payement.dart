@@ -1,3 +1,4 @@
+import 'package:bama/api/mobile_money_service.dart';
 import 'package:bama/components/appbar.dart';
 import 'package:bama/models/ticket_model.dart';
 import 'package:bama/screens/tickets/tickets.dart';
@@ -16,6 +17,7 @@ class PayementView extends StatefulWidget {
   final String userId;
   final String organiserId;
   final int amount;
+  final String PayOf;
   const PayementView({
     super.key,
     required this.eventId,
@@ -24,6 +26,7 @@ class PayementView extends StatefulWidget {
     required this.userId,
     required this.organiserId,
     required this.amount,
+    required this.PayOf,
   });
 
   @override
@@ -31,46 +34,53 @@ class PayementView extends StatefulWidget {
 }
 
 class _PayementViewState extends State<PayementView> {
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _amountController = TextEditingController();
+   // Instances des services de paiement
+  OrangeMoneyService _orangeApi = OrangeMoneyService();
+  MobiCashService _mobicashApi = MobiCashService();
 
-  String selectedMethod = 'Orange Money';
+  bool isLoading = false; // Pour afficher un loader pendant un paiement
+  final TextEditingController _amountController = TextEditingController(); // Champ montant
+  String selectedMethod = 'Orange Money'; // Méthode de paiement par défaut
 
+  // Initialisation
   @override
   void initState() {
     super.initState();
-    _amountController.text = widget.amount.toString();
+    _amountController.text = widget.amount.toString(); // Remplit le montant automatiquement
   }
 
-  void _pay() {
-    String phone = _phoneController.text.trim();
+  // Fonction principale de paiement
+  void _pay() async {
     String amount = _amountController.text.trim();
 
-    if (phone.isEmpty || amount.isEmpty) {
-      Fluttertoast.showToast(
-        msg: "Veuillez remplir tous les champs",
-        backgroundColor: Colors.deepOrange,
-        textColor: Colors.white,
-      );
-      return;
-    }
-
-    // Simule un paiement
     Fluttertoast.showToast(
       msg: "Paiement de $amount FCFA via $selectedMethod en cours...",
+      backgroundColor: Colors.deepOrange,
+      textColor: Colors.white,
       toastLength: Toast.LENGTH_LONG,
     );
 
-    //Intégrer ici l’API Orange Money / MobiCash
+    // Paiement selon la méthode choisie
+    if (selectedMethod == 'Orange Money') {
+      if (widget.PayOf == "abonnement") {
+        await _orangeApi.payer(amount: widget.amount, orderId: widget.eventId);
+        activerAbonnement(); // Active l’abonnement
+      }
+      await _orangeApi.payer(amount: widget.amount, orderId: widget.eventId);
+    } else if (selectedMethod == "MobiCash") {
+      if (widget.PayOf == "abonnement") {
+        await _mobicashApi.payer(amount: widget.amount, orderId: widget.eventId);
+        activerAbonnement();
+      }
+      await _mobicashApi.payer(amount: widget.amount, orderId: widget.eventId);
+    }
 
-    //declencher la fonction pour creer ticket apres avoir acheter
-    // final user = FirebaseAuth.instance.currentUser;
-    // final id = FirebaseFirestore.instance.collection('tickets').doc().id;
-
-    const double commissionRate = 0.10; // 10%
+    // Calcul de la commission et du revenu net
+    const double commissionRate = 0.10;
     final int commission = (widget.amount * commissionRate).round();
     final int netRevenue = widget.amount - commission;
 
+    // Création du ticket après paiement
     buyTicket(
       eventId: widget.eventId,
       eventTitle: widget.eventTitle,
@@ -81,7 +91,7 @@ class _PayementViewState extends State<PayementView> {
     );
   }
 
-  // 4️⃣ CRÉATION DE TICKET APRÈS ACHAT
+  // Fonction pour créer un ticket dans Firestore
   Future<void> buyTicket({
     required String eventId,
     required String eventTitle,
@@ -91,7 +101,9 @@ class _PayementViewState extends State<PayementView> {
     required int netRevenue,
   }) async {
     final user = FirebaseAuth.instance.currentUser;
+
     final id = FirebaseFirestore.instance.collection('tickets').doc().id;
+
     final ticket = TicketModel(
       ticketId: id,
       eventId: eventId,
@@ -105,6 +117,8 @@ class _PayementViewState extends State<PayementView> {
       purchasedAt: DateTime.now().toIso8601String(),
       isUsed: false,
     );
+
+    // Enregistre le ticket dans Firestore
     await FirebaseFirestore.instance
         .collection('tickets')
         .doc(id)
@@ -112,7 +126,7 @@ class _PayementViewState extends State<PayementView> {
 
     print(ticket);
 
-    // Enregistrer la commission dans une autre collection (facultatif mais recommandé)
+    // Sauvegarde la commission pour des statistiques futures
     await FirebaseFirestore.instance.collection('commissions').add({
       'ticketId': id,
       'eventId': eventId,
@@ -122,9 +136,65 @@ class _PayementViewState extends State<PayementView> {
       'timestamp': DateTime.now(),
     });
 
+    // Incrémente le nombre de tickets vendus
+    await incrementSoldCount(
+      eventId: widget.eventId,
+      ticketType: widget.ticketType,
+    );
+
+    // Redirection vers la page des tickets
     Navigator.push(context, MaterialPageRoute(builder: (_) => TicketView()));
   }
 
+  // Fonction pour activer un abonnement premium pendant 90 jours
+  Future<void> activerAbonnement() async {
+    setState(() => isLoading = true);
+
+    try {
+      final finAbonnement = DateTime.now().add(Duration(days: 90));
+
+      // ⚠️ À décommenter si tu veux enregistrer dans Firestore
+      // await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
+      //   'isPremium': true,
+      //   'subscriptionUntil': finAbonnement.toIso8601String(),
+      // });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Abonnement activé jusqu’au ${finAbonnement.day}/${finAbonnement.month}/${finAbonnement.year}"),
+        ),
+      );
+    } catch (e) {
+      print("Erreur abonnement : $e");
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Erreur : $e")));
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+  // Fonction pour incrémenter le nombre de tickets vendus dans Firestore
+  Future<void> incrementSoldCount({
+    required String eventId,
+    required String ticketType,
+  }) async {
+    final docRef = FirebaseFirestore.instance.collection('events').doc(eventId);
+
+    await FirebaseFirestore.instance.runTransaction((transaction) async {
+      final snapshot = await transaction.get(docRef);
+      if (!snapshot.exists) return;
+
+      final ticketTypes = snapshot.data()!['ticketTypes'];
+      if (ticketTypes == null || !ticketTypes.containsKey(ticketType)) return;
+
+      final currentSold = ticketTypes[ticketType]['sold'] ?? 0;
+
+      // Mise à jour du champ sold
+      transaction.update(docRef, {
+        'ticketTypes.${ticketType}.sold': currentSold + 1,
+      });
+    });
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -194,31 +264,6 @@ class _PayementViewState extends State<PayementView> {
                           });
                         },
                       ),
-                      SizedBox(height: 16.h),
-                      TextField(
-                        style: GoogleFonts.poppins(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                        controller: _phoneController,
-                        decoration: InputDecoration(
-                          labelText: "Numéro de téléphone",
-                          labelStyle: GoogleFonts.poppins(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(
-                            Icons.phone,
-                            size: 20.sp,
-                            color: Colors.white,
-                          ),
-                        ),
-                        keyboardType: TextInputType.phone,
-                      ),
-                      SizedBox(height: 16.h),
                       TextField(
                         style: GoogleFonts.poppins(
                           fontSize: 14.sp,
@@ -243,29 +288,33 @@ class _PayementViewState extends State<PayementView> {
                         keyboardType: TextInputType.number,
                       ),
                       SizedBox(height: 20.h),
-                      ElevatedButton.icon(
-                        onPressed: _pay,
-                        icon: Icon(Icons.payment, color: Colors.white),
-                        label: Text(
-                          "Payer",
-                          style: GoogleFonts.poppins(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadiusGeometry.circular(50),
-                          ),
-                          minimumSize: Size(400.w, 40.h),
-                          backgroundColor: Colors.deepOrange,
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 30.r,
-                            vertical: 12.r,
-                          ),
-                        ),
-                      ),
+                      isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : ElevatedButton.icon(
+                              onPressed: _pay,
+                              icon: Icon(Icons.payment, color: Colors.white),
+                              label: Text(
+                                "Payer",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadiusGeometry.circular(
+                                    50,
+                                  ),
+                                ),
+                                minimumSize: Size(400.w, 40.h),
+                                backgroundColor: Colors.deepOrange,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 30.r,
+                                  vertical: 12.r,
+                                ),
+                              ),
+                            ),
                     ],
                   ),
                 ),

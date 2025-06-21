@@ -22,7 +22,7 @@ class CategorieModel {
       CategorieModel(
         icon: Mdi.food,
         title: 'Diné',
-        color: Colors.amberAccent,
+        color: Colors.deepOrange,
       ),
       CategorieModel(
         icon: Mdi.theater,

@@ -3,6 +3,7 @@ import 'package:bama/screens/profil/profil.dart';
 import 'package:bama/screens/tickets/tickets.dart';
 import 'package:bama/utils/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mdi_icons/flutter_mdi_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
@@ -32,12 +33,11 @@ class _RoutesState extends State<Routes> {
     return GNav(
       selectedIndex: _currentIndex,
       onTabChange: (index) => setState(() => _currentIndex = index),
-
       // Layout & animation
       mainAxisAlignment: MainAxisAlignment.center,
       padding: EdgeInsets.all(8.r),
       tabMargin: EdgeInsets.all(8.r),
-      gap: 5.r,
+      gap: 10.r,
       duration: const Duration(milliseconds: 600),
       curve: Curves.easeInOut,
 
@@ -56,20 +56,20 @@ class _RoutesState extends State<Routes> {
       // Onglets
       tabs: [
         GButton(
-          icon: Icons.home_rounded,
-          text: "Evenements",
+          icon: _currentIndex == 0 ? Icons.home_rounded :Icons.home_outlined,
+          text: "Événements",
           iconColor: Colors.white,
           iconSize: 24.sp,
         ),
         GButton(
-          icon: LineIcons.alternateTicket,
+          icon:_currentIndex == 1 ? LineIcons.alternateTicket : Mdi.ticket,
           text: "Tickets",
           iconSize: 24.sp,
           iconColor: Colors.white,
           leading: Stack(
             clipBehavior: Clip.none,
             children: [
-              Icon(LineIcons.alternateTicket, size: 24.sp, color: Colors.white),
+              Icon(_currentIndex == 1 ? Mdi.ticketConfirmation  : Mdi.ticketOutline, size: 24.sp, color: Colors.white),
               Positioned(
                 right: -6,
                 top: -2,
@@ -90,7 +90,7 @@ class _RoutesState extends State<Routes> {
         ),
 
         GButton(
-          icon: Icons.person_outline_outlined,
+          icon:_currentIndex == 2 ? Icons.person : Icons.person_outline_outlined ,
           text: "Profil",
           iconColor: Colors.white,
           iconSize: 24.sp,

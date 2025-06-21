@@ -69,6 +69,8 @@ class _LoginViewState extends State<LoginView> {
             'phone': userCred.user!.phoneNumber ?? '',
             'email': userCred.user!.email,
             'photo': userCred.user!.photoURL ?? '',
+            'merchant_key':'',
+            'role':"",
             'isPremium': false,
             'subscriptionUntil': '',
             'createdAt': DateTime.now().toIso8601String(),
@@ -324,7 +326,7 @@ class _LoginViewState extends State<LoginView> {
                     "Annuler",
                     style: GoogleFonts.poppins(
                       fontSize: 12.sp,
-                      color: Colors.deepPurple,
+                      color: Colors.blueAccent,
                     ),
                   ),
                 ),

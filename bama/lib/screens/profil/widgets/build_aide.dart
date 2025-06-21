@@ -8,11 +8,11 @@ class BuildAideBtn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 2.r),
+      padding: EdgeInsets.symmetric(horizontal: 16.r),
       sliver: SliverToBoxAdapter(
         child: Container(
           decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(color: Colors.grey[500]!))
+            // border: Border(bottom: BorderSide(color: Colors.grey[500]!))
           ),
           child: ListTile(
             onTap: () {

@@ -1,3 +1,4 @@
+import 'package:bama/screens/events/event_adm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,15 +9,15 @@ class BuildAdmEventBtn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 2.r),
+      padding: EdgeInsets.symmetric(horizontal: 16.r),
       sliver: SliverToBoxAdapter(
         child: Container(
           decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(color: Colors.grey[500]!))
+            // border: Border(bottom: BorderSide(color: Colors.grey[500]!))
           ),
           child: ListTile(
             onTap: () {
-            
+             Navigator.push(context, MaterialPageRoute(builder: (context)=> EventAdm()));
             },
             leading: Icon(Icons.event_available_sharp, size: 22.sp, color: Colors.grey[200]),
             title: Text(

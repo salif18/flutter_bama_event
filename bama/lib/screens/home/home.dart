@@ -95,16 +95,16 @@ Widget _buildContainer(BuildContext context) {
         color: ColorApp.backgroundCard,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.horizontal(
-            left: Radius.circular(20.r),
-            right: Radius.circular(20.r),
+            left: Radius.circular(2.r),
+            right: Radius.circular(2.r),
           ),
         ),
         child: TabBar(
           indicator: BoxDecoration(
-            color: const Color.fromARGB(255, 173, 117, 44),
+            color:const Color.fromARGB(255, 204, 134, 43),
             borderRadius: BorderRadius.horizontal(
-              left: Radius.circular(20.r),
-              right: Radius.circular(20.r),
+              left: Radius.circular(2.r),
+              right: Radius.circular(2.r),
             ),
           ),
           indicatorSize: TabBarIndicatorSize.tab,

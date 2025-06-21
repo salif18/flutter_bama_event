@@ -129,6 +129,7 @@ class _DetailViewState extends State<DetailView> {
                             userId: "12b",
                             organiserId: widget.item.organiserId,
                             amount: ticket.price,
+                            PayOf: '',
                           ),
                         ),
                       );
