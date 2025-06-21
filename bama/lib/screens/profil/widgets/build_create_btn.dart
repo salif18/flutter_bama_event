@@ -17,7 +17,26 @@ class BuildCreateBtn extends StatelessWidget {
           ),
           child: ListTile(
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context)=> FormEvent()));
+                //  final hasAccess =
+                //             await UserService().canAccessPremiumFeatures();
+                //         if (!hasAccess) {
+                //           ScaffoldMessenger.of(context).showSnackBar(
+                //             SnackBar(
+                //               content: Text(
+                //                 "Accès refusé. Abonnez-vous pour continuer.",
+                //               ),
+                //             ),
+                //           );
+                //           Navigator.push(
+                //             context,
+                //             MaterialPageRoute(
+                //               builder: (context) => AbonnementPage(),
+                //             ),
+                //           );
+                        // } else {
+                           Navigator.push(context, MaterialPageRoute(builder: (context)=> FormEvent()));
+                        // }
+             
             },
             leading: Icon(Icons.add, size: 28.sp, color: Colors.grey[200]),
             title: Text(

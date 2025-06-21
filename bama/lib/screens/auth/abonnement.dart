@@ -1,6 +1,9 @@
 import 'package:bama/components/appbar.dart';
+import 'package:bama/routes.dart';
 import 'package:bama/screens/payement/payement.dart';
 import 'package:bama/utils/colors.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,7 +16,79 @@ class AbonnementPage extends StatefulWidget {
 }
 
 class _AbonnementPageState extends State<AbonnementPage> {
- 
+  bool hasTried = false;
+  bool isLoading = false; // Pour afficher un loader pendant un paiement
+
+  // Fonction pour activer un abonnement premium pendant 90 jours
+  Future<void> activerEssay(BuildContext context) async {
+    setState(() => isLoading = true);
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      final finAbonnement = DateTime.now().add(Duration(days: 7));
+
+      // ⚠️ À décommenter si tu veux enregistrer dans Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .update({
+            'isPremium': true,
+            'subscriptionUntil': finAbonnement.toIso8601String(),
+            'startTrial': DateTime.now().toIso8601String(),
+          });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Abonnement activé jusqu’au ${finAbonnement.day}/${finAbonnement.month}/${finAbonnement.year}",
+          ),
+        ),
+      );
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => Routes()),
+        (route) => false,
+      );
+    } catch (e) {
+      print("Erreur abonnement : $e");
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Erreur : $e")));
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkIfUserHasTried();
+  }
+
+  // verification si le essay est epuise pour interdire certaine truc
+  Future<void> checkIfUserHasTried() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final doc =
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+    final data = doc.data();
+
+    if (data != null && data['startTrial'] != null) {
+      setState(() {
+        hasTried = true; // utilisateur a déjà activé un essai
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        hasTried = false; // pas encore essayé
+        isLoading = false;
+      });
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,6 +158,31 @@ class _AbonnementPageState extends State<AbonnementPage> {
                                 minimumSize: Size.fromHeight(50.r),
                               ),
                             ),
+                            SizedBox(height: 16.h,),
+                             isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : (!hasTried
+                              ? ElevatedButton.icon(
+                                onPressed: () => activerEssay(context),
+                                icon: Icon(
+                                  Icons.lock_open,
+                                  size: 24.sp,
+                                  color: Colors.white,
+                                ),
+                                label: Text(
+                                  "Mode d’Essai 7 jour",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 14.sp,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue,
+                                  padding: EdgeInsets.symmetric(vertical: 14.r),
+                                  minimumSize: Size.fromHeight(50.r),
+                                ),
+                              )
+                              : SizedBox()), // bouton caché si déjà essayé
                     ],
                   ),
                 ),

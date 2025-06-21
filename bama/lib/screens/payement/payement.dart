@@ -52,6 +52,7 @@ class _PayementViewState extends State<PayementView> {
   // Fonction principale de paiement
   void _pay() async {
     String amount = _amountController.text.trim();
+   final user = FirebaseAuth.instance.currentUser;
 
     Fluttertoast.showToast(
       msg: "Paiement de $amount FCFA via $selectedMethod en cours...",
@@ -63,16 +64,16 @@ class _PayementViewState extends State<PayementView> {
     // Paiement selon la méthode choisie
     if (selectedMethod == 'Orange Money') {
       if (widget.PayOf == "abonnement") {
-        await _orangeApi.payer(amount: widget.amount, orderId: widget.eventId);
+        await _orangeApi.payer(amount: widget.amount, orderId: user!.uid);
         activerAbonnement(); // Active l’abonnement
       }
-      await _orangeApi.payer(amount: widget.amount, orderId: widget.eventId);
+      await _orangeApi.payer(amount: widget.amount, orderId:  user!.uid);
     } else if (selectedMethod == "MobiCash") {
       if (widget.PayOf == "abonnement") {
-        await _mobicashApi.payer(amount: widget.amount, orderId: widget.eventId);
+        await _mobicashApi.payer(amount: widget.amount, orderId:  user!.uid);
         activerAbonnement();
       }
-      await _mobicashApi.payer(amount: widget.amount, orderId: widget.eventId);
+      await _mobicashApi.payer(amount: widget.amount, orderId:  user!.uid);
     }
 
     // Calcul de la commission et du revenu net
@@ -157,6 +158,7 @@ class _PayementViewState extends State<PayementView> {
       // await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
       //   'isPremium': true,
       //   'subscriptionUntil': finAbonnement.toIso8601String(),
+      //   'startTrial': DateTime.now().toIso8601String(),
       // });
 
       ScaffoldMessenger.of(context).showSnackBar(

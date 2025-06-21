@@ -1,6 +1,7 @@
 import 'package:bama/components/notification.dart';
 import 'package:bama/provider/notifcation_provider.dart';
 import 'package:bama/routes.dart';
+import 'package:bama/globale.dart';
 import 'package:bama/utils/colors.dart';
 // import 'package:firebase_core/firebase_core.dart';
 // import 'package:firebase_messaging/firebase_messaging.dart';
@@ -68,6 +69,7 @@ class _MyAppState extends State<MyApp> {
       splitScreenMode: true,
       builder: (context, child) {
         return MaterialApp(
+             navigatorKey: navigatorKey, // pour activation desactivation de notification soit pris en compte navigatorkey
           title: 'Bama Events',
           debugShowCheckedModeBanner: false,
           home: SafeArea(

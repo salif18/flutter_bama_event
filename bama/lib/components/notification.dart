@@ -1,8 +1,11 @@
+import 'package:bama/globale.dart';
+import 'package:bama/provider/notifcation_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:provider/provider.dart';
 
 class NotificationService {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
@@ -59,7 +62,14 @@ class NotificationService {
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
 
-      if (notification != null && android != null) {
+      // Récupère le controller dans le contexte global
+      // pour activation desactivation de notification soit pris en compte navigatorkey
+      final controller = Provider.of<NotificationController>(
+        navigatorKey.currentContext!,
+        listen: false,
+      );
+
+      if (notification != null && android != null && controller.isEnabled) {
         flutterLocalNotificationsPlugin.show(
           notification.hashCode,
           notification.title,
