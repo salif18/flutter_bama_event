@@ -39,17 +39,17 @@ class _OrganiserDashboardState extends State<OrganiserDashboard> {
     int totalRevenue = 0;
     int totalCommission = 0;
 
-    // for (var doc in snapshot.docs) {
-    //   totalRevenue += doc['price'] ?? 0;
-    //   totalCommission += doc['commission'] ?? 0;
-    // }
+    for (var doc in snapshot.docs) {
+      totalRevenue += doc['netRevenue'] as int;
+      totalCommission += doc['commission'] as int;
+    }
 
     setState(() {
       stats = {
         'totalTickets': totalTickets,
         'totalRevenue': totalRevenue,
         'totalCommission': totalCommission,
-        'netRevenue': totalRevenue - totalCommission,
+        'netRevenue': totalRevenue //- totalCommission,
       };
     });
   }

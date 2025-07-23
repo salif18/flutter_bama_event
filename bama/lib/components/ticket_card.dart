@@ -58,18 +58,20 @@ class TicketCard extends StatelessWidget {
                 SizedBox(height: 16.h),
 
                 // Informations
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Column(
+               
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '🎟️ ID: ${ticket.ticketId.substring(0, 8)}',
+                      '🎟️ ID: ${ticket.eventTitle}',
                       style: GoogleFonts.poppins(
                         fontSize: 12.sp,
                         color: Colors.grey[300],
                       ),
                     ),
+                     SizedBox(height: 5.h),
                     Text(
-                      '👤 ${ticket.userId}',
+                      '👤 ${ticket.userId.substring(0,4)}',
                       style: GoogleFonts.poppins(
                         fontSize: 12.sp,
                         color: Colors.grey[300],
@@ -77,7 +79,7 @@ class TicketCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 10.h),
+                SizedBox(height: 5.h),
                 Text(
                   '📅 Acheté le: ${ticket.purchasedAt.split("T").first}',
                   style: GoogleFonts.poppins(

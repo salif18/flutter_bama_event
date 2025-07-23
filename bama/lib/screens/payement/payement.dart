@@ -1,6 +1,7 @@
 import 'package:bama/api/mobile_money_service.dart';
 import 'package:bama/components/appbar.dart';
 import 'package:bama/models/ticket_model.dart';
+import 'package:bama/routes.dart';
 import 'package:bama/screens/tickets/tickets.dart';
 import 'package:bama/utils/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -34,25 +35,27 @@ class PayementView extends StatefulWidget {
 }
 
 class _PayementViewState extends State<PayementView> {
-   // Instances des services de paiement
+  // Instances des services de paiement
   OrangeMoneyService _orangeApi = OrangeMoneyService();
   MobiCashService _mobicashApi = MobiCashService();
 
   bool isLoading = false; // Pour afficher un loader pendant un paiement
-  final TextEditingController _amountController = TextEditingController(); // Champ montant
+  final TextEditingController _amountController =
+      TextEditingController(); // Champ montant
   String selectedMethod = 'Orange Money'; // Méthode de paiement par défaut
 
   // Initialisation
   @override
   void initState() {
     super.initState();
-    _amountController.text = widget.amount.toString(); // Remplit le montant automatiquement
+    _amountController.text = widget.amount
+        .toString(); // Remplit le montant automatiquement
   }
 
   // Fonction principale de paiement
   void _pay() async {
     String amount = _amountController.text.trim();
-   final user = FirebaseAuth.instance.currentUser;
+    final user = FirebaseAuth.instance.currentUser;
 
     Fluttertoast.showToast(
       msg: "Paiement de $amount FCFA via $selectedMethod en cours...",
@@ -65,15 +68,15 @@ class _PayementViewState extends State<PayementView> {
     if (selectedMethod == 'Orange Money') {
       if (widget.PayOf == "abonnement") {
         await _orangeApi.payer(amount: widget.amount, orderId: user!.uid);
-        activerAbonnement(); // Active l’abonnement
+        activerAbonnement(amount); // Active l’abonnement
       }
-      await _orangeApi.payer(amount: widget.amount, orderId:  user!.uid);
+      await _orangeApi.payer(amount: widget.amount, orderId: user!.uid);
     } else if (selectedMethod == "MobiCash") {
       if (widget.PayOf == "abonnement") {
-        await _mobicashApi.payer(amount: widget.amount, orderId:  user!.uid);
-        activerAbonnement();
+        await _mobicashApi.payer(amount: widget.amount, orderId: user!.uid);
+        activerAbonnement(amount);
       }
-      await _mobicashApi.payer(amount: widget.amount, orderId:  user!.uid);
+      await _mobicashApi.payer(amount: widget.amount, orderId: user!.uid);
     }
 
     // Calcul de la commission et du revenu net
@@ -125,8 +128,6 @@ class _PayementViewState extends State<PayementView> {
         .doc(id)
         .set(ticket.toJson());
 
-    print(ticket);
-
     // Sauvegarde la commission pour des statistiques futures
     await FirebaseFirestore.instance.collection('commissions').add({
       'ticketId': id,
@@ -144,37 +145,58 @@ class _PayementViewState extends State<PayementView> {
     );
 
     // Redirection vers la page des tickets
+    if (!mounted) return;
     Navigator.push(context, MaterialPageRoute(builder: (_) => TicketView()));
   }
 
   // Fonction pour activer un abonnement premium pendant 90 jours
-  Future<void> activerAbonnement() async {
+  Future<void> activerAbonnement(amount) async {
     setState(() => isLoading = true);
 
     try {
       final finAbonnement = DateTime.now().add(Duration(days: 90));
+      final user = FirebaseAuth.instance.currentUser;
 
       // ⚠️ À décommenter si tu veux enregistrer dans Firestore
-      // await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
-      //   'isPremium': true,
-      //   'subscriptionUntil': finAbonnement.toIso8601String(),
-      //   'startTrial': DateTime.now().toIso8601String(),
-      // });
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .update({
+            'isPremium': true,
+            'subscriptionUntil': finAbonnement.toIso8601String(),
+            'startTrial': DateTime.now().toIso8601String(),
+          });
 
+      await FirebaseFirestore.instance
+      .collection('abonnements')
+      .add({
+        'montant':amount,
+      });
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Abonnement activé jusqu’au ${finAbonnement.day}/${finAbonnement.month}/${finAbonnement.year}"),
+          content: Text(
+            "Abonnement activé jusqu’au ${finAbonnement.day}/${finAbonnement.month}/${finAbonnement.year}",
+          ),
         ),
+      );
+       if (!mounted) return;
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => Routes()),
+        (route) => false,
       );
     } catch (e) {
       print("Erreur abonnement : $e");
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Erreur : $e")));
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Erreur : $e")));
     } finally {
       setState(() => isLoading = false);
     }
   }
 
-  // Fonction pour incrémenter le nombre de tickets vendus dans Firestore
   Future<void> incrementSoldCount({
     required String eventId,
     required String ticketType,
@@ -185,18 +207,24 @@ class _PayementViewState extends State<PayementView> {
       final snapshot = await transaction.get(docRef);
       if (!snapshot.exists) return;
 
-      final ticketTypes = snapshot.data()!['ticketTypes'];
-      if (ticketTypes == null || !ticketTypes.containsKey(ticketType)) return;
+      List<dynamic> ticketTypes = snapshot.data()!['ticketTypes'];
 
-      final currentSold = ticketTypes[ticketType]['sold'] ?? 0;
+      for (int i = 0; i < ticketTypes.length; i++) {
+        final ticket = ticketTypes[i];
 
-      // Mise à jour du champ sold
-      transaction.update(docRef, {
-        'ticketTypes.${ticketType}.sold': currentSold + 1,
-      });
+        if (ticket['type'].toString().trim() == ticketType.trim()) {
+          int currentSold = ticket['sold'] ?? 0;
+          ticket['sold'] = currentSold + 1;
+          ticketTypes[i] = ticket;
+          break;
+        }
+      }
+
+      // Mise à jour de tout le tableau ticketTypes
+      transaction.update(docRef, {'ticketTypes': ticketTypes});
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

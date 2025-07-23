@@ -31,7 +31,7 @@ class _HomeViewState extends State<HomeView> {
                 BuildAppBarHome(),
                 BuildWelcomMessage(),
                 _buildTitle(context, "Les plus proches"),
-                ImageSlider(),
+                 ImageSlider(),
                 _buildTitle(context, "Catégories"),
                 BuildCategoriList(),
                 SliverPadding(

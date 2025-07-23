@@ -23,18 +23,20 @@ class _LoginViewState extends State<LoginView> {
   // 🔐 Connexion avec email/mot de passe
   Future<void> _signInWithEmail() async {
     if (!_formKey.currentState!.validate()) return;
-
     setState(() => isLoading = true);
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailCtrl.text.trim(),
         password: passwordCtrl.text.trim(),
       );
-
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Connexion réussie ✅")));
+      if (!mounted) return;
+      Navigator.pop(context, true);
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("Erreur: ${e.toString()}")));
@@ -60,26 +62,36 @@ class _LoginViewState extends State<LoginView> {
         credential,
       );
 
-      await FirebaseFirestore.instance
+      final userDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(userCred.user!.uid)
-          .set({
-            'userId': userCred.user!.uid,
-            'name': userCred.user!.displayName ?? '',
-            'phone': userCred.user!.phoneNumber ?? '',
-            'email': userCred.user!.email,
-            'photo': userCred.user!.photoURL ?? '',
-            'merchant_key':'',
-            'role':"",
-            'isPremium': false,
-            'subscriptionUntil': '',
-            'createdAt': DateTime.now().toIso8601String(),
-          });
+          .get();
 
+      if (!userDoc.exists) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCred.user!.uid)
+            .set({
+              'userId': userCred.user!.uid,
+              'name': userCred.user!.displayName ?? '',
+              'phone': userCred.user!.phoneNumber ?? '',
+              'email': userCred.user!.email,
+              'photo': userCred.user!.photoURL ?? '',
+              'merchant_key': '',
+              'role':"utilisateur", // <-- on ne crée le rôle vide que si c’est un nouveau
+              'isPremium': false,
+              'subscriptionUntil': '',
+              'createdAt': DateTime.now().toIso8601String(),
+            });
+      }
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Connexion Google réussie ✅")),
       );
+      if (!mounted) return;
+      Navigator.pop(context, true);
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("Erreur Google: ${e.toString()}")));

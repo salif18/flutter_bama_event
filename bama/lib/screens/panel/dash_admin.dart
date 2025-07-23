@@ -33,10 +33,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
     int totalRevenue = 0;
     int totalCommission = 0;
 
-    // for (var doc in snapshot.docs) {
-      // totalRevenue += doc['price'] ?? 0;
-      // totalCommission += doc['commission'] ?? 0;
-    // }
+    for (var doc in snapshot.docs) {
+      totalRevenue += doc['netRevenue'] as int ;
+      totalCommission += doc['commission']as int ;
+    }
 
     setState(() {
       stats = {

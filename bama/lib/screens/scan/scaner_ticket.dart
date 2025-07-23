@@ -53,17 +53,18 @@ class _ScanTicketPageState extends State<ScanTicketPage> {
       }
 
       final ticket = query.docs.first;
-      final bool isUsed = ticket['used'] == true;
+      final bool isUsed = ticket['is_used'] == true;
 
       if (isUsed) {
         _showDialog("Déjà utilisé ⚠️", "Ce ticket a déjà été utilisé.");
       } else {
         // Marquer comme utilisé
-        await ticket.reference.update({'used': true});
+        await ticket.reference.update({'is_used': true});
         _showDialog("Ticket valide ✅", "Accès autorisé à l'événement.");
       }
     } catch (e) {
       _showDialog("Erreur", "Une erreur est survenue : $e");
+      print(e.toString());
     }
   }
 

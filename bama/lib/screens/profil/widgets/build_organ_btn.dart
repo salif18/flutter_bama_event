@@ -22,7 +22,7 @@ class BuildPremiumBtn extends StatelessWidget {
             },
             leading: Icon(Mdi.ticketAccount, size: 22.sp, color: Colors.grey[200]),
             title: Text(
-              "Devenir organisateur",
+              "Abonnement organisateur",
               style: GoogleFonts.poppins(
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w400,

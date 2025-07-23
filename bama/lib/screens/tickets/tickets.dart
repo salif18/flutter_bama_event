@@ -2,6 +2,8 @@ import 'package:bama/components/appbar.dart';
 import 'package:bama/components/ticket_card.dart';
 import 'package:bama/models/ticket_model.dart';
 import 'package:bama/utils/colors.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,6 +16,26 @@ class TicketView extends StatefulWidget {
 }
 
 class _TicketViewState extends State<TicketView> {
+  Future<List<TicketModel>> fetchTickets({bool isUsed = false}) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return [];
+ try {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('tickets')
+        .where('user_id', isEqualTo: user.uid)
+        .where('is_used', isEqualTo: isUsed)
+        .get();
+
+    return snapshot.docs.map((doc) {
+      return TicketModel.fromJson(doc.data());
+    }).toList();
+    } catch (e) {
+    debugPrint('Erreur de parsing ticket: $e');
+    return [];
+  }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,44 +67,89 @@ class _TicketViewState extends State<TicketView> {
                     children: [
                       CustomScrollView(
                         slivers: [
-                          // doit être un sliver, ex: SliverList ou SliverToBoxAdapter
-                          SliverPadding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16.r,
-                              vertical: 8.r,
-                            ),
-                            sliver: SliverList(
-                              delegate: SliverChildBuilderDelegate((
-                                BuildContext context,
-                                index,
-                              ) {
-                                TicketModel item =
-                                    TicketModel.generateFakeTickets()[index];
-                                return TicketCard(ticket: item);
-                              }, childCount: 1),
-                            ),
+                          FutureBuilder<List<TicketModel>>(
+                            future: fetchTickets(isUsed: false),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return SliverFillRemaining(
+                                  child: Center(
+                                    child: CircularProgressIndicator(color: Colors.orange.shade700,),
+                                  ),
+                                );
+                              }
+
+                              if (snapshot.hasError) {
+                                return SliverFillRemaining(
+                                  child: Center(
+                                    child: Text("Erreur de chargement",style: GoogleFonts.poppins(fontSize: 14.sp, color: Colors.white),),
+                                  ),
+                                );
+                              }
+
+                              final tickets = snapshot.data ?? [];
+
+                              if (tickets.isEmpty) {
+                                return SliverFillRemaining(
+                                  child: Center(
+                                    child: Text("Aucun ticket en cours",style: GoogleFonts.poppins(fontSize: 14.sp, color: Colors.white),),
+                                  ),
+                                );
+                              }
+
+                              return SliverList(
+                                delegate: SliverChildBuilderDelegate((
+                                  context,
+                                  index,
+                                ) {
+                                  return TicketCard(ticket: tickets[index]);
+                                }, childCount: tickets.length),
+                              );
+                            },
                           ),
                         ],
                       ),
                       CustomScrollView(
                         slivers: [
-                          // autre contenu
-                          SliverPadding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16.r,
-                              vertical: 8.r,
-                            ),
-                            sliver: SliverList(
-                              delegate: SliverChildBuilderDelegate(
-                                (BuildContext context, index) {
-                                  TicketModel item =
-                                      TicketModel.generateFakeTickets()[index];
-                                  return TicketCard(ticket: item);
-                                },
-                                childCount:
-                                    TicketModel.generateFakeTickets().length,
-                              ),
-                            ),
+                          FutureBuilder<List<TicketModel>>(
+                            future: fetchTickets(isUsed: true),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const SliverFillRemaining(
+                                  child: Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                );
+                              }
+
+                              if (snapshot.hasError) {
+                                return SliverFillRemaining(
+                                  child: Center(
+                                    child: Text("Erreur de chargement",style: GoogleFonts.poppins(fontSize: 14.sp, color: Colors.white),),
+                                  ),
+                                );
+                              }
+
+                              final tickets = snapshot.data ?? [];
+
+                              if (tickets.isEmpty) {
+                                return SliverFillRemaining(
+                                  child: Center(
+                                    child: Text("Aucun ticket épuisé",style: GoogleFonts.poppins(fontSize: 14.sp, color: Colors.white),),
+                                  ),
+                                );
+                              }
+
+                              return SliverList(
+                                delegate: SliverChildBuilderDelegate((
+                                  context,
+                                  index,
+                                ) {
+                                  return TicketCard(ticket: tickets[index]);
+                                }, childCount: tickets.length),
+                              );
+                            },
                           ),
                         ],
                       ),

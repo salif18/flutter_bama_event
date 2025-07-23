@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:bama/components/appbar.dart';
 import 'package:bama/maps/maps.dart';
 import 'package:bama/models/categorie_model.dart';
+import 'package:bama/screens/myevent/my_event.dart';
 import 'package:bama/utils/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -59,6 +61,7 @@ class _FormEventState extends State<FormEvent> {
       }
     } catch (e) {
       // ignore: use_build_context_synchronously
+      if(!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("Erreur: ${e.toString()}")));
@@ -101,66 +104,62 @@ class _FormEventState extends State<FormEvent> {
 
   // vers firebase
   Future<String> uploadSingleImageToFirebase(XFile image) async {
-  final FirebaseStorage storage = FirebaseStorage.instance;
+    final FirebaseStorage storage = FirebaseStorage.instance;
 
-  File file = File(image.path);
+    File file = File(image.path);
 
-  // Référence unique pour l’image
-  final Reference ref = storage.ref().child(
-    'images/${DateTime.now().millisecondsSinceEpoch}_${image.name}',
-  );
-
-  final UploadTask uploadTask = ref.putFile(file);
-  await uploadTask;
-
-  final String downloadUrl = await ref.getDownloadURL();
-  return downloadUrl; // ✅ retourne une seule URL
-}
-
-
-// vers cloudinary
-  Future<String?> uploadSingleImageToCloudinary(XFile image) async {
-  const cloudName = 'dm4qhqazr'; // ← Ton Cloudinary cloud name
-  const uploadPreset = 'bama_event'; // ← Ton preset signé
-
-  final dio = Dio();
-
-  final file = await MultipartFile.fromFile(
-    image.path,
-    filename: image.name,
-  );
-
-  final formData = FormData.fromMap({
-    'file': file,
-    'upload_preset': uploadPreset,
-  });
-
-  try {
-    final response = await dio.post(
-      'https://api.cloudinary.com/v1_1/$cloudName/image/upload',
-      data: formData,
+    // Référence unique pour l’image
+    final Reference ref = storage.ref().child(
+      'images/${DateTime.now().millisecondsSinceEpoch}_${image.name}',
     );
 
-    if (response.statusCode == 200) {
-      return response.data['secure_url']; // ✅ retourne une seule URL
-    } else {
-      print('Erreur Cloudinary (${response.statusCode}): ${response.data}');
+    final UploadTask uploadTask = ref.putFile(file);
+    await uploadTask;
+
+    final String downloadUrl = await ref.getDownloadURL();
+    return downloadUrl; // ✅ retourne une seule URL
+  }
+
+  // vers cloudinary
+  Future<String?> uploadSingleImageToCloudinary(XFile image) async {
+    const cloudName = 'dm4qhqazr'; // ← Ton Cloudinary cloud name
+    const uploadPreset = 'bama_event'; // ← Ton preset signé
+
+    final dio = Dio();
+
+    final file = await MultipartFile.fromFile(image.path, filename: image.name);
+
+    final formData = FormData.fromMap({
+      'file': file,
+      'upload_preset': uploadPreset,
+    });
+
+    try {
+      final response = await dio.post(
+        'https://api.cloudinary.com/v1_1/$cloudName/image/upload',
+        data: formData,
+      );
+
+      if (response.statusCode == 200) {
+        return response.data['secure_url']; // ✅ retourne une seule URL
+      } else {
+        print('Erreur Cloudinary (${response.statusCode}): ${response.data}');
+        return null;
+      }
+    } catch (e) {
+      print('Erreur lors de l\'upload : $e');
       return null;
     }
-  } catch (e) {
-    print('Erreur lors de l\'upload : $e');
-    return null;
   }
-}
 
-
-  void submit() async{
+  void submit() async {
+    final user = FirebaseAuth.instance.currentUser;
     if (_formKey.currentState!.validate()) {
-
       final imageUrl = await uploadSingleImageToCloudinary(galleryImage!);
       // final imageUrl = await uploadSingleImageToFirebase(galleryImage!);
 
       final eventData = {
+        'organiserId': user!.uid,
         'title': titleCtrl.text,
         'description': descriptionCtrl.text,
         'date': dateCtrl.text,
@@ -174,22 +173,23 @@ class _FormEventState extends State<FormEvent> {
             'type': map['type']!.text,
             'price': int.tryParse(map['price']!.text) ?? 0,
             'available': int.tryParse(map['available']!.text) ?? 0,
+            'sold': 0,
           };
         }).toList(),
       };
 
-      print("🎉 Événement prêt à être envoyé :");
-      print(eventData);
-      
-      // TODO: envoyer dans Firebase ou autre backend   
-     final docRef = FirebaseFirestore.instance.collection('events').doc(); // Génère un ID
-     await docRef.set(eventData);
+      final docRef = FirebaseFirestore.instance
+          .collection('events')
+          .doc(); // Génère un ID
+      await docRef.set(eventData);
 
       // addEvent(eventData);
-
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Événement prêt à être enregistré.")),
+        const SnackBar(content: Text("Événement enregistré avec succè.")),
       );
+       if (!mounted) return;
+       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const MyEvent()));
     }
   }
 

@@ -33,10 +33,11 @@ class _AbonnementPageState extends State<AbonnementPage> {
           .doc(user!.uid)
           .update({
             'isPremium': true,
+            'role': "organisateur",
             'subscriptionUntil': finAbonnement.toIso8601String(),
             'startTrial': DateTime.now().toIso8601String(),
           });
-
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -44,13 +45,14 @@ class _AbonnementPageState extends State<AbonnementPage> {
           ),
         ),
       );
+      if (!mounted) return;
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => Routes()),
         (route) => false,
       );
     } catch (e) {
-      print("Erreur abonnement : $e");
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("Erreur : $e")));
@@ -70,11 +72,10 @@ class _AbonnementPageState extends State<AbonnementPage> {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
-    final doc =
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .get();
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
     final data = doc.data();
 
     if (data != null && data['startTrial'] != null) {
@@ -89,6 +90,7 @@ class _AbonnementPageState extends State<AbonnementPage> {
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -103,16 +105,16 @@ class _AbonnementPageState extends State<AbonnementPage> {
               SliverPadding(
                 padding: EdgeInsets.all(16.r),
                 sliver: SliverFillRemaining(
-                   hasScrollBody: false,
+                  hasScrollBody: false,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Devenir organisateur premium",
+                        "Organisateur premium",
                         style: GoogleFonts.poppins(
                           fontSize: 22.sp,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white
+                          color: Colors.white,
                         ),
                       ),
                       SizedBox(height: 12.h),
@@ -121,7 +123,10 @@ class _AbonnementPageState extends State<AbonnementPage> {
                         "✅ Suivi des ventes et des revenus\n"
                         "✅ Statistiques avancées\n"
                         "✅ Priorité dans l'affichage",
-                        style: GoogleFonts.poppins(fontSize: 14.sp, color: Colors.white),
+                        style: GoogleFonts.poppins(
+                          fontSize: 14.sp,
+                          color: Colors.white,
+                        ),
                       ),
                       SizedBox(height: 20.h),
                       Text(
@@ -129,60 +134,70 @@ class _AbonnementPageState extends State<AbonnementPage> {
                         style: GoogleFonts.poppins(
                           fontSize: 16.sp,
                           color: ColorApp.titleColor,
-                          fontWeight: FontWeight.bold
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 200.h,),
+                      SizedBox(height: 200.h),
                       ElevatedButton.icon(
-                              onPressed:()=> Navigator.push(context, MaterialPageRoute(
-                                builder: (context)=> 
-                              PayementView(
-                                eventId: "", 
-                                eventTitle: "", 
-                                ticketType: "Abonnement", 
-                                userId: "", 
-                                organiserId: "", 
-                                amount: 10000, 
-                                PayOf: "abonnement"))),
-                              icon: Icon(Icons.lock_open, size: 24.sp, color: Colors.white,),
-                              label: Text(
-                                "Activer maintenant",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 14.sp,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.orange,
-                                padding: EdgeInsets.symmetric(vertical: 14.r),
-                                minimumSize: Size.fromHeight(50.r),
-                              ),
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PayementView(
+                              eventId: "",
+                              eventTitle: "",
+                              ticketType: "Abonnement",
+                              userId: "",
+                              organiserId: "",
+                              amount: 10000,
+                              PayOf: "abonnement",
                             ),
-                            SizedBox(height: 16.h,),
-                             isLoading
+                          ),
+                        ),
+                        icon: Icon(
+                          Icons.lock_open,
+                          size: 24.sp,
+                          color: Colors.white,
+                        ),
+                        label: Text(
+                          "Activer maintenant",
+                          style: GoogleFonts.poppins(
+                            fontSize: 14.sp,
+                            color: Colors.white,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          padding: EdgeInsets.symmetric(vertical: 14.r),
+                          minimumSize: Size.fromHeight(50.r),
+                        ),
+                      ),
+                      SizedBox(height: 16.h),
+                      isLoading
                           ? const Center(child: CircularProgressIndicator())
                           : (!hasTried
-                              ? ElevatedButton.icon(
-                                onPressed: () => activerEssay(context),
-                                icon: Icon(
-                                  Icons.lock_open,
-                                  size: 24.sp,
-                                  color: Colors.white,
-                                ),
-                                label: Text(
-                                  "Mode d’Essai 7 jour",
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14.sp,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blue,
-                                  padding: EdgeInsets.symmetric(vertical: 14.r),
-                                  minimumSize: Size.fromHeight(50.r),
-                                ),
-                              )
-                              : SizedBox()), // bouton caché si déjà essayé
+                                ? ElevatedButton.icon(
+                                    onPressed: () => activerEssay(context),
+                                    icon: Icon(
+                                      Icons.lock_open,
+                                      size: 24.sp,
+                                      color: Colors.white,
+                                    ),
+                                    label: Text(
+                                      "Mode d’Essai 7 jour",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 14.sp,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.blue,
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 14.r,
+                                      ),
+                                      minimumSize: Size.fromHeight(50.r),
+                                    ),
+                                  )
+                                : SizedBox()), // bouton caché si déjà essayé
                     ],
                   ),
                 ),

@@ -43,22 +43,26 @@ class _OrganisateurViewState extends State<OrganisateurView> {
             'phone': phoneCtrl.text.trim(),
             'email': emailCtrl.text.trim(),
             'photo': '',
-            'merchant_key':'',
+            'merchant_key': '',
             'role': 'organisateur',
             'isPremium': false,
-            'subscriptionUntil':'',
+            'subscriptionUntil': '',
             'createdAt': DateTime.now().toIso8601String(),
           });
-
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Compte créé avec succès ✅")),
       );
 
-      Navigator.push(context, MaterialPageRoute(builder: (context)=> AbonnementPage()));
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erreur: ${e.toString()}")),
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => AbonnementPage()),
       );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Erreur: ${e.toString()}")));
     } finally {
       setState(() => isLoading = false);
     }
@@ -77,8 +81,9 @@ class _OrganisateurViewState extends State<OrganisateurView> {
         idToken: googleAuth.idToken,
       );
 
-      final userCred =
-          await FirebaseAuth.instance.signInWithCredential(credential);
+      final userCred = await FirebaseAuth.instance.signInWithCredential(
+        credential,
+      );
 
       await FirebaseFirestore.instance
           .collection('users')
@@ -89,21 +94,26 @@ class _OrganisateurViewState extends State<OrganisateurView> {
             'phone': userCred.user!.phoneNumber ?? '',
             'email': userCred.user!.email,
             'photo': userCred.user!.photoURL ?? '',
-            'merchant_key':'',
-            'role':"organisateur",
+            'merchant_key': '',
+            'role': "organisateur",
             'isPremium': false,
-            'subscriptionUntil':'',
+            'subscriptionUntil': '',
             'createdAt': DateTime.now().toIso8601String(),
           });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Compte Google connecté ✅")),
-      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Compte Google connecté ✅")));
 
-        Navigator.push(context, MaterialPageRoute(builder: (context)=> AbonnementPage()));
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erreur: ${e.toString()}")),
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => AbonnementPage()),
       );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Erreur: ${e.toString()}")));
     } finally {
       setState(() => isLoading = false);
     }
@@ -115,132 +125,151 @@ class _OrganisateurViewState extends State<OrganisateurView> {
       backgroundColor: const Color(0xFF1F1F1F),
       body: SafeArea(
         child: CustomScrollView(
-          slivers:[ SliverFillRemaining(
-            child: Padding(
-              padding: EdgeInsets.all(20.r),
-              child: Form(
-                key: _formKey,
-                child: ListView(
-                  children: [
-                    SizedBox(height: 40.h),
-                    Text(
-                      "Créer un compte organisateur",
-                      style: GoogleFonts.poppins(
-                        fontSize: 26.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+          slivers: [
+            SliverFillRemaining(
+              child: Padding(
+                padding: EdgeInsets.all(20.r),
+                child: Form(
+                  key: _formKey,
+                  child: ListView(
+                    children: [
+                      SizedBox(height: 40.h),
+                      Text(
+                        "Créer un compte organisateur",
+                        style: GoogleFonts.poppins(
+                          fontSize: 26.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 30.h),
-            
-                    TextFormField(
-                      controller: nameCtrl,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        labelText: "Nom complet",
-                        labelStyle:  GoogleFonts.poppins(
-                        fontSize: 16.sp,             
-                        color: Colors.white,
-                      ),
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (val) =>
-                          val != null && val.length > 2 ? null : "Nom trop court",
-                    ),
-                    SizedBox(height: 16.h),
-            
-                    TextFormField(
-                      controller: phoneCtrl,
-                      style: const TextStyle(color: Colors.white),
-                      keyboardType: TextInputType.phone,
-                      decoration: InputDecoration(
-                        labelText: "Téléphone",
-                        labelStyle: GoogleFonts.poppins(
-                        fontSize: 16.sp,             
-                        color: Colors.white,
-                      ),
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (val) =>
-                          val != null && val.length >= 8 ? null : "Numéro invalide",
-                    ),
-                    SizedBox(height: 16.h),
-            
-                    TextFormField(
-                      controller: emailCtrl,
-                      style: const TextStyle(color: Colors.white),
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                        labelText: "Email",
-                        labelStyle: GoogleFonts.poppins(
-                        fontSize: 16.sp,             
-                        color: Colors.white,
-                      ),
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (val) =>
-                          val != null && val.contains('@') ? null : "Email invalide",
-                    ),
-                    SizedBox(height: 16.h),
-            
-                    TextFormField(
-                      controller: passwordCtrl,
-                      obscureText: true,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        labelText: "Mot de passe",
-                        labelStyle:GoogleFonts.poppins(
-                        fontSize: 16.sp,             
-                        color: Colors.white,
-                      ),
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (val) =>
-                          val != null && val.length >= 6 ? null : "6 caractères min.",
-                    ),
-                    SizedBox(height: 24.h),
-            
-                    isLoading
-                        ? const Center(child: CircularProgressIndicator())
-                        : Column(
-                            children: [
-                              ElevatedButton.icon(
-                                onPressed: _registerWithEmail,
-                                label: Text("S'inscrire", style: GoogleFonts.poppins(
-                        fontSize: 16.sp,             
-                        color: Colors.black,
-                      ),),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.amber,
-                                  padding: EdgeInsets.symmetric(vertical: 14.r),
-                                  minimumSize: Size.fromHeight(50.r),
-                                ),
-                              ),
-                              SizedBox(height: 16.h),
-                              OutlinedButton.icon(
-                                onPressed: _registerWithGoogle,
-                                icon: Image.asset("assets/logos/google.jpg", height: 24.h),
-                                label: Text("Continuer avec Google", style: GoogleFonts.poppins(
-                        fontSize: 14.sp,             
-                        color: Colors.white,
-                      ),),
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: Colors.white,
-                                  side: const BorderSide(color: Colors.white54),
-                                  padding: EdgeInsets.symmetric(vertical: 14.r),
-                                  minimumSize: Size.fromHeight(50.r),
-                                ),
-                              ),
-                              
-                          
-                            ],
+                      SizedBox(height: 30.h),
+
+                      TextFormField(
+                        controller: nameCtrl,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          labelText: "Nom complet",
+                          labelStyle: GoogleFonts.poppins(
+                            fontSize: 16.sp,
+                            color: Colors.white,
                           ),
-                  ],
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (val) => val != null && val.length > 2
+                            ? null
+                            : "Nom trop court",
+                      ),
+                      SizedBox(height: 16.h),
+
+                      TextFormField(
+                        controller: phoneCtrl,
+                        style: const TextStyle(color: Colors.white),
+                        keyboardType: TextInputType.phone,
+                        decoration: InputDecoration(
+                          labelText: "Téléphone",
+                          labelStyle: GoogleFonts.poppins(
+                            fontSize: 16.sp,
+                            color: Colors.white,
+                          ),
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (val) => val != null && val.length >= 8
+                            ? null
+                            : "Numéro invalide",
+                      ),
+                      SizedBox(height: 16.h),
+
+                      TextFormField(
+                        controller: emailCtrl,
+                        style: const TextStyle(color: Colors.white),
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          labelText: "Email",
+                          labelStyle: GoogleFonts.poppins(
+                            fontSize: 16.sp,
+                            color: Colors.white,
+                          ),
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (val) => val != null && val.contains('@')
+                            ? null
+                            : "Email invalide",
+                      ),
+                      SizedBox(height: 16.h),
+
+                      TextFormField(
+                        controller: passwordCtrl,
+                        obscureText: true,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          labelText: "Mot de passe",
+                          labelStyle: GoogleFonts.poppins(
+                            fontSize: 16.sp,
+                            color: Colors.white,
+                          ),
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (val) => val != null && val.length >= 6
+                            ? null
+                            : "6 caractères min.",
+                      ),
+                      SizedBox(height: 24.h),
+
+                      isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : Column(
+                              children: [
+                                ElevatedButton.icon(
+                                  onPressed: _registerWithEmail,
+                                  label: Text(
+                                    "S'inscrire",
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 16.sp,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.amber,
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 14.r,
+                                    ),
+                                    minimumSize: Size.fromHeight(50.r),
+                                  ),
+                                ),
+                                SizedBox(height: 16.h),
+                                OutlinedButton.icon(
+                                  onPressed: _registerWithGoogle,
+                                  icon: Image.asset(
+                                    "assets/logos/google.jpg",
+                                    height: 24.h,
+                                  ),
+                                  label: Text(
+                                    "Continuer avec Google",
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 14.sp,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: Colors.white,
+                                    side: const BorderSide(
+                                      color: Colors.white54,
+                                    ),
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 14.r,
+                                    ),
+                                    minimumSize: Size.fromHeight(50.r),
+                                  ),
+                                ),
+                              ],
+                            ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-       ] ),
+          ],
+        ),
       ),
     );
   }

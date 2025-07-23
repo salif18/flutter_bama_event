@@ -1,6 +1,5 @@
 import 'package:bama/screens/auth/login.dart';
 import 'package:bama/screens/auth/organisateur.dart';
-import 'package:bama/utils/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -45,17 +44,18 @@ class _RegisterViewState extends State<RegisterView> {
             'phone': phoneCtrl.text.trim(),
             'email': emailCtrl.text.trim(),
             'photo': '',
-            'merchant_key':'',
-            'role':"",
+            'merchant_key': '',
+            'role': "utilisateur",
             'isPremium': false,
-            'subscriptionUntil':'',
+            'subscriptionUntil': '',
             'createdAt': DateTime.now().toIso8601String(),
           });
-
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Compte créé avec succès ✅")),
       );
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("Erreur: ${e.toString()}")));
@@ -90,17 +90,18 @@ class _RegisterViewState extends State<RegisterView> {
             'phone': userCred.user!.phoneNumber ?? '',
             'email': userCred.user!.email,
             'photo': userCred.user!.photoURL ?? '',
-            'merchant_key':'',
-            'role':"",
+            'merchant_key': '',
+            'role': "utilisateur",
             'isPremium': false,
-            'subscriptionUntil':'',
+            'subscriptionUntil': '',
             'createdAt': DateTime.now().toIso8601String(),
           });
-
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Compte Google connecté ✅")));
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("Erreur: ${e.toString()}")));

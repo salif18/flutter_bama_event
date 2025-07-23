@@ -3,6 +3,7 @@ import 'package:bama/screens/detail/widgets/ui_detail_appbar.dart';
 import 'package:bama/screens/detail/widgets/ui_infos.dart';
 import 'package:bama/screens/payement/payement.dart';
 import 'package:bama/utils/colors.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -68,6 +69,7 @@ class _DetailViewState extends State<DetailView> {
   }
 
   void _windowShow(context) {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
     showModalBottomSheet(
       context: context,
       backgroundColor: ColorApp.backgroundApp,
@@ -126,7 +128,7 @@ class _DetailViewState extends State<DetailView> {
                             eventId: widget.item.id,
                             eventTitle: widget.item.title,
                             ticketType: ticket.type,
-                            userId: "12b",
+                            userId: userId!,
                             organiserId: widget.item.organiserId,
                             amount: ticket.price,
                             PayOf: '',

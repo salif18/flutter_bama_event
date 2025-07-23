@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "743000414425",
+    "project_id": "bama-events",
+    "storage_bucket": "bama-events.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:743000414425:android:3094465c8fbb8c1cc706c8",
+        "android_client_info": {
+          "package_name": "com.example.bama"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "743000414425-pbs50ctj4d0l174ucuthblc41p9vdegk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.bama",
+            "certificate_hash": "6338a3d2c5f5e7af1232a57a8a169ea7f205e3ba"
+          }
+        },
+        {
+          "client_id": "743000414425-varllh9s26i6h5qa0ecj4updsilh35go.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCh4OOH_9fsG4gNz2eiQ9GAxEXWrcWRzOU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "743000414425-varllh9s26i6h5qa0ecj4updsilh35go.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "743000414425-h0usa6vnbhs52va7cr4ijhlbu6miblq9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.bama"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
