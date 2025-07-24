@@ -33,7 +33,9 @@ class Event {
     organiserId: data["organiserId"] ?? '',
     title: data["title"] ?? '',
     description: data["description"] ?? '',
-    date: (data["date"] as Timestamp).toDate(),
+    date: data["date"]  is Timestamp
+    ? (data["date"] as Timestamp).toDate()
+    : DateTime.parse(data["date"]),
     horaire: data["horaire"] ?? '',
     location: data["location"] ?? '',
     long: (data["long"] as num?)?.toDouble() ?? 0.0,

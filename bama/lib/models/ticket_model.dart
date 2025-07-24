@@ -38,7 +38,9 @@ class TicketModel {
     commission: json['commission'] ?? 0,
     netRevenue: json['netRevenue'] ?? 0,
     qrCode: json["qr_code"] ?? "", // Ajouté fallback
-    purchasedAt: (json["purchased_at"] as Timestamp).toDate(),
+    purchasedAt: json["purchased_at"] is Timestamp
+    ? (json["purchased_at"] as Timestamp).toDate()
+    : DateTime.parse(json["purchased_at"]),
     isUsed: json['is_used'] ?? false, // Ajouté fallback
   );
 }

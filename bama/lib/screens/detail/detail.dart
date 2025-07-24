@@ -1,4 +1,5 @@
 import 'package:bama/models/event_model.dart';
+import 'package:bama/screens/auth/login.dart';
 import 'package:bama/screens/detail/widgets/ui_detail_appbar.dart';
 import 'package:bama/screens/detail/widgets/ui_infos.dart';
 import 'package:bama/screens/payement/payement.dart';
@@ -70,6 +71,13 @@ class _DetailViewState extends State<DetailView> {
 
   void _windowShow(context) {
     final userId = FirebaseAuth.instance.currentUser?.uid;
+    final user = FirebaseAuth.instance.currentUser;
+
+  if (user == null) {
+    // L'utilisateur n'est pas connecté → redirection vers la page de connexion
+    Navigator.push(context,MaterialPageRoute(builder: (context) => const LoginView()));// Assure-toi que cette route existe
+    return;
+  }
     showModalBottomSheet(
       context: context,
       backgroundColor: ColorApp.backgroundApp,
