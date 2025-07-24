@@ -29,10 +29,10 @@ class _LoginViewState extends State<LoginView> {
         email: emailCtrl.text.trim(),
         password: passwordCtrl.text.trim(),
       );
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Connexion réussie ✅")));
+      // if (!mounted) return;
+      // ScaffoldMessenger.of(
+      //   context,
+      // ).showSnackBar(const SnackBar(content: Text("Connexion réussie ✅")));
       if (!mounted) return;
       Navigator.pop(context, true);
     } catch (e) {
@@ -84,10 +84,10 @@ class _LoginViewState extends State<LoginView> {
               'createdAt': DateTime.now().toIso8601String(),
             });
       }
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Connexion Google réussie ✅")),
-      );
+      // if (!mounted) return;
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text("Connexion Google réussie ✅")),
+      // );
       if (!mounted) return;
       Navigator.pop(context, true);
     } catch (e) {

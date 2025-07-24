@@ -36,6 +36,7 @@ class _FormEventState extends State<FormEvent> {
   final TextEditingController latCtrl = TextEditingController();
   final TextEditingController longCtrl = TextEditingController();
   String? selectedCategory;
+  DateTime? pickedDate; // ✅ variable pour stocker la vraie date
 
   // Ticket types
   List<Map<String, TextEditingController>> ticketTypeControllers = [];
@@ -61,7 +62,7 @@ class _FormEventState extends State<FormEvent> {
       }
     } catch (e) {
       // ignore: use_build_context_synchronously
-      if(!mounted) return;
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("Erreur: ${e.toString()}")));
@@ -161,8 +162,11 @@ class _FormEventState extends State<FormEvent> {
       final eventData = {
         'organiserId': user!.uid,
         'title': titleCtrl.text,
+        'categorie': selectedCategory,
         'description': descriptionCtrl.text,
-        'date': dateCtrl.text,
+        'date': pickedDate != null
+            ? Timestamp.fromDate(pickedDate!)
+            : null, // ✅ vrai format Timestamp
         'horaire': horaireCtrl.text,
         'location': locationCtrl.text,
         'lat': double.tryParse(latCtrl.text) ?? 0,
@@ -188,8 +192,11 @@ class _FormEventState extends State<FormEvent> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Événement enregistré avec succè.")),
       );
-       if (!mounted) return;
-       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const MyEvent()));
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MyEvent()),
+      );
     }
   }
 
@@ -372,9 +379,11 @@ class _FormEventState extends State<FormEvent> {
                     lastDate: DateTime(2100),
                   );
                   if (picked != null) {
-                    String formatted = DateFormat('yyyy-MM-dd').format(picked);
                     setState(() {
-                      dateCtrl.text = formatted;
+                      pickedDate = picked; // ✅ stocker la vraie DateTime
+                      dateCtrl.text = DateFormat(
+                        'yyyy-MM-dd',
+                      ).format(picked); // pour l'affichage
                     });
                   }
                 },

@@ -118,7 +118,7 @@ class _PayementViewState extends State<PayementView> {
       commission: commission,
       netRevenue: netRevenue,
       qrCode: id,
-      purchasedAt: DateTime.now().toIso8601String(),
+      purchasedAt: DateTime.now(),
       isUsed: false,
     );
 

@@ -101,9 +101,9 @@ class _OrganisateurViewState extends State<OrganisateurView> {
             'createdAt': DateTime.now().toIso8601String(),
           });
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Compte Google connecté ✅")));
+      // ScaffoldMessenger.of(
+      //   context,
+      // ).showSnackBar(const SnackBar(content: Text("Compte Google connecté ✅")));
 
       Navigator.push(
         context,

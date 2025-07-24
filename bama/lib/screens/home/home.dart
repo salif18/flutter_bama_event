@@ -1,5 +1,6 @@
 import 'package:bama/screens/home/widgets/ui_appbar.dart';
 import 'package:bama/screens/home/widgets/ui_categories_list.dart';
+import 'package:bama/screens/home/widgets/ui_event_last.dart';
 import 'package:bama/screens/home/widgets/ui_event_list.dart';
 import 'package:bama/screens/home/widgets/ui_slider.dart';
 import 'package:bama/screens/home/widgets/ui_welcom_user.dart';
@@ -54,7 +55,7 @@ class _HomeViewState extends State<HomeView> {
                       ),
                       CustomScrollView(
                         slivers: [
-                          BuildEvenList(), // autre contenu
+                          BuildEventLastList(), // autre contenu
                         ],
                       ),
                     ],

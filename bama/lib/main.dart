@@ -8,6 +8,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
@@ -17,12 +19,12 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   print("Message reçu en arrière-plan complet : ${message.notification?.body}");
 }
-void main()async{
-  
+
+void main() async {
   // Définir la couleur et le style de la status bar
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
-      statusBarColor: ColorApp.backgroundApp,// 👈 ta couleur de fond souhaitée
+      statusBarColor: ColorApp.backgroundApp, // 👈 ta couleur de fond souhaitée
       statusBarIconBrightness:
           Brightness.light, // ou Brightness.dark si fond clair
     ),
@@ -34,9 +36,14 @@ void main()async{
 
   // lire la notification en arriere plan
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-    runApp(
+  WidgetsFlutterBinding.ensureInitialized();
+  // Initialiser les données locales pour 'fr_FR'
+  await initializeDateFormatting('fr_FR', null);
+  runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => NotificationController())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => NotificationController()),
+      ],
       child: const MyApp(),
     ),
   );
@@ -52,7 +59,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
 
-    // Dans votre widget principal
+  // Dans votre widget principal
   @override
   void initState() {
     super.initState();
@@ -69,12 +76,18 @@ class _MyAppState extends State<MyApp> {
       splitScreenMode: true,
       builder: (context, child) {
         return MaterialApp(
-             navigatorKey: navigatorKey, // pour activation desactivation de notification soit pris en compte navigatorkey
+          navigatorKey:
+              navigatorKey, // pour activation desactivation de notification soit pris en compte navigatorkey
           title: 'Bama Events',
           debugShowCheckedModeBanner: false,
-          home: SafeArea(
-            child: child!,
-          ),
+          locale: Locale('fr', 'FR'), // Définir la locale par défaut
+          localizationsDelegates: [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: [Locale('fr', 'FR')],
+          home: SafeArea(child: child!),
         );
       },
       child: Routes(),

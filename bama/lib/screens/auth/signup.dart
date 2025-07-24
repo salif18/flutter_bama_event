@@ -51,9 +51,10 @@ class _RegisterViewState extends State<RegisterView> {
             'createdAt': DateTime.now().toIso8601String(),
           });
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Compte créé avec succès ✅")),
-      );
+       Navigator.pop(context, true);
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text("Compte créé avec succès ✅")),
+      // );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(
@@ -97,9 +98,10 @@ class _RegisterViewState extends State<RegisterView> {
             'createdAt': DateTime.now().toIso8601String(),
           });
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Compte Google connecté ✅")));
+       Navigator.pop(context, true);
+      // ScaffoldMessenger.of(
+      //   context,
+      // ).showSnackBar(const SnackBar(content: Text("Compte Google connecté ✅")));
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(

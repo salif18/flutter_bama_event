@@ -1,5 +1,6 @@
 import 'package:bama/models/event_model.dart';
 import 'package:bama/utils/colors.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -37,6 +38,7 @@ class BuildInfoEvent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+     final formattedDate = DateFormat('dd MMMM yyyy', 'fr_FR').format(item.date);
     return SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 16.r),
       sliver: // Détails de l'événement
@@ -62,7 +64,7 @@ class BuildInfoEvent extends StatelessWidget {
                 ),
                 SizedBox(width: 8.w),
                 Text(
-                 item.date,
+                 formattedDate,
                   style: GoogleFonts.poppins(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.bold,

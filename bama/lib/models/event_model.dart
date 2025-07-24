@@ -1,9 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Event {
   final String id;
   final String organiserId;
   final String title;
   final String description;
-  final String date;
+  final DateTime date;
   final String horaire;
   final String location;
   final double? long;
@@ -31,7 +33,7 @@ class Event {
     organiserId: data["organiserId"] ?? '',
     title: data["title"] ?? '',
     description: data["description"] ?? '',
-    date: data["date"] ?? '',
+    date: (data["date"] as Timestamp).toDate(),
     horaire: data["horaire"] ?? '',
     location: data["location"] ?? '',
     long: (data["long"] as num?)?.toDouble() ?? 0.0,
@@ -50,7 +52,7 @@ class Event {
       'organiserId':organiserId,
       'title': title,
       'description': description,
-      'date': date,
+      'date': date.toIso8601String(),
       'horaire': horaire,
       'location': location,
       'long': long,

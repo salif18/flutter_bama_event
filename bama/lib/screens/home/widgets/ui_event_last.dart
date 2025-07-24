@@ -5,18 +5,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class BuildEvenList extends StatelessWidget {
-   BuildEvenList({super.key});
+class BuildEventLastList extends StatelessWidget {
+  const BuildEventLastList({super.key});
 
-  //final List<Event> _data = Event.getFakeEvents();
-  Future<List<Event>> fetchEvents() async {
+  Future<List<Event>> fetchPastEvents() async {
   try {
-    final snapshot = await FirebaseFirestore.instance.collection('events').get();
+    final now = Timestamp.fromDate(DateTime.now());
+
+    final snapshot = await FirebaseFirestore.instance
+        .collection('events')
+        .where('date', isLessThan: now)
+        .get();
+
     return snapshot.docs.map((doc) {
       return Event.fromMap(doc.data(), doc.id);
     }).toList();
   } catch (e) {
-    print('Erreur fetchEvents: $e');
+    print('Erreur fetchPastEvents: $e');
     rethrow;
   }
 }
@@ -25,7 +30,7 @@ class BuildEvenList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Event>>(
-      future: fetchEvents(),
+      future: fetchPastEvents(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return SliverFillRemaining(
@@ -40,7 +45,7 @@ class BuildEvenList extends StatelessWidget {
         }
 
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return SliverFillRemaining(child: Center(child: Text('Aucun événement trouvé',style: GoogleFonts.poppins(fontSize: 14, color: Colors.white),)));
+              return SliverFillRemaining(child: Center(child: Text('Aucun événement trouvé',style: GoogleFonts.poppins(fontSize: 14.sp, color: Colors.white),)));
             }
 
         final events = snapshot.data ?? [];

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../models/ticket_model.dart';
 import '../utils/colors.dart';
@@ -8,10 +9,13 @@ import '../utils/colors.dart';
 class TicketCard extends StatelessWidget {
   final TicketModel ticket;
 
-  const TicketCard({super.key, required this.ticket});
+  TicketCard({super.key, required this.ticket});
+
+  
 
   @override
   Widget build(BuildContext context) {
+    final formattedDate = DateFormat('dd MMMM yyyy', 'fr_FR').format(ticket.purchasedAt);
     return AspectRatio(
       aspectRatio: 1 / 2,
       child: Container(
@@ -81,7 +85,7 @@ class TicketCard extends StatelessWidget {
                 ),
                 SizedBox(height: 5.h),
                 Text(
-                  '📅 Acheté le: ${ticket.purchasedAt.split("T").first}',
+                  '📅 Acheté le: $formattedDate',
                   style: GoogleFonts.poppins(
                     fontSize: 13.sp,
                     color: ColorApp.titleColor,

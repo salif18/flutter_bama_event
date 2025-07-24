@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class TicketModel {
   final String ticketId;
   final String eventId;
@@ -8,7 +10,7 @@ class TicketModel {
   final int commission;
   final int netRevenue;
   final String qrCode;
-  final String purchasedAt;
+  final DateTime purchasedAt; // au lieu de String
   final bool isUsed;
 
   TicketModel({
@@ -36,7 +38,7 @@ class TicketModel {
     commission: json['commission'] ?? 0,
     netRevenue: json['netRevenue'] ?? 0,
     qrCode: json["qr_code"] ?? "", // Ajouté fallback
-    purchasedAt: json["purchasedAt"]?.toDate() ?? "", // Ajouté fallback
+    purchasedAt: (json["purchased_at"] as Timestamp).toDate(),
     isUsed: json['is_used'] ?? false, // Ajouté fallback
   );
 }
@@ -53,7 +55,7 @@ class TicketModel {
       'commission':commission,
       'netRevenue':netRevenue,
       "qr_code": qrCode,
-      "purchased_at": purchasedAt,
+      "purchased_at": purchasedAt.toIso8601String(),
       'is_used': isUsed,
     };
   }

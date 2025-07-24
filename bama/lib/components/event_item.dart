@@ -4,6 +4,7 @@ import 'package:bama/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 class EventItem extends StatelessWidget {
   final Event item;
@@ -11,6 +12,7 @@ class EventItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+     final formattedDate = DateFormat('dd MMMM yyyy', 'fr_FR').format(item.date);
     return InkWell(
       onTap: () => Navigator.push(
         context,
@@ -52,7 +54,7 @@ class EventItem extends StatelessWidget {
                         SizedBox(width: 4.w),
                         Expanded(
                           child: Text(
-                            item.date,
+                            formattedDate,
                             style: GoogleFonts.roboto(
                               fontSize: 14.sp,
                               fontWeight: FontWeight.normal,
